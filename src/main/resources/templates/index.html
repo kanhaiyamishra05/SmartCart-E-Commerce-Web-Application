@@ -49,7 +49,7 @@
 				<div class="d-flex align-items-center gap-3">
 					<div class="text-center">
 						<p class="small opacity-75 mb-2">Ends in:</p>
-						<div class="d-flex gap-2" th:id="${'countdown-' + fs.id}" th:attr="data-end=${#dates.format(fs.endTime, 'yyyy-MM-dd\'T\'HH:mm:ss')}">
+						<div class="d-flex gap-2" th:id="${'countdown-' + fs.id}" th:attr="data-end=${#dates.format(fs.endTime, 'yyyy-MM-dd') + 'T' + #dates.format(fs.endTime, 'HH:mm:ss')}">
 							<div class="countdown-box"><div class="num" id="h-[[${fs.id}]]">00</div><div class="lbl">Hours</div></div>
 							<div class="countdown-box"><div class="num" id="m-[[${fs.id}]]">00</div><div class="lbl">Mins</div></div>
 							<div class="countdown-box"><div class="num" id="s-[[${fs.id}]]">00</div><div class="lbl">Secs</div></div>
