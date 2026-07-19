@@ -32,9 +32,11 @@ public class FlashSale {
 	private Double discountPercentage;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	private Date startTime;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	private Date endTime;
 
 	private Boolean isActive;
