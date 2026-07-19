@@ -17,6 +17,9 @@ public class ReviewServiceImpl implements ReviewService {
 	@Override
 	public ProductReview saveReview(ProductReview review) {
 		review.setReviewDate(new Date());
+		if (review.getIsApproved() == null) {
+			review.setIsApproved(true); // auto-approve new reviews; admin can hide later
+		}
 		return reviewRepository.save(review);
 	}
 
