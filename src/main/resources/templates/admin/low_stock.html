@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Low Stock Alert</title></head>
+<body><section>
+<div class="container-fluid mt-5 p-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-triangle-exclamation text-danger"></i> Low Stock Alerts</h4>
+
+  <div th:if="${lowStockProducts == null || lowStockProducts.size() == 0}" class="alert alert-success">
+    <i class="fa-solid fa-check-circle me-2"></i> All products are well stocked! No low stock items found.
+  </div>
+
+  <div class="card shadow-sm border-0" th:if="${lowStockProducts != null && lowStockProducts.size() > 0}">
+    <div class="card-header bg-danger text-white fw-bold">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i> [[${lowStockProducts.size()}]] Product(s) Need Restocking
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr><th>#</th><th>Image</th><th>Product Name</th><th>Category</th><th>Stock Level</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="p, i : ${lowStockProducts}">
+            <td>[[${i.count}]]</td>
+            <td><img th:src="@{'/img/product_img/' + ${p.image}}" width="50" height="50" style="object-fit:cover; border-radius:6px;"></td>
+            <td class="fw-semibold">[[${p.title}]]</td>
+            <td>[[${p.category}]]</td>
+            <td>
+              <span th:if="${p.stock == 0}" class="badge bg-danger fs-6">OUT OF STOCK (0)</span>
+              <span th:if="${p.stock > 0 && p.stock <= 2}" class="badge bg-warning text-dark fs-6">CRITICAL ([[${p.stock}]] left)</span>
+              <span th:if="${p.stock > 2 && p.stock <= 5}" class="badge bg-info text-dark fs-6">LOW ([[${p.stock}]] left)</span>
+            </td>
+            <td>
+              <span th:if="${p.isActive}" class="badge bg-success">Active</span>
+              <span th:unless="${p.isActive}" class="badge bg-secondary">Inactive</span>
+            </td>
+            <td>
+              <a th:href="@{'/admin/editProduct/' + ${p.id}}" class="btn btn-sm btn-outline-primary">
+                <i class="fa-solid fa-pen me-1"></i> Edit / Restock
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section></body></html>

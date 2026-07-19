@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Coupon Usage Report</title></head>
+<body><section>
+<div class="container-fluid mt-5 p-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-chart-bar text-info"></i> Coupon Usage Report</h4>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted mb-1">Total Coupons</h5>
+        <h3 class="fw-bold text-primary">[[${coupons.size()}]]</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted mb-1">Total Uses</h5>
+        <h3 class="fw-bold text-success" th:text="${coupons.stream().mapToInt(c -> c.usageCount != null ? c.usageCount : 0).sum()}">0</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-3">
+        <h5 class="text-muted mb-1">Active Coupons</h5>
+        <h3 class="fw-bold text-warning" th:text="${coupons.stream().filter(c -> c.isActive).count()}">0</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-dark">
+          <tr><th>#</th><th>Code</th><th>Discount %</th><th>Min Order</th><th>Expiry</th><th>Status</th><th>Times Used</th></tr>
+        </thead>
+        <tbody>
+          <tr th:if="${coupons == null || coupons.size() == 0}">
+            <td colspan="7" class="text-center text-muted py-3">No coupons found.</td>
+          </tr>
+          <tr th:each="c, i : ${coupons}">
+            <td>[[${i.count}]]</td>
+            <td><code class="text-danger fw-bold">[[${c.code}]]</code></td>
+            <td><span class="badge bg-danger">[[${c.discountPercentage}]]% OFF</span></td>
+            <td>
+              <span th:if="${c.minOrderAmount != null}">₹[[${c.minOrderAmount}]]</span>
+              <span th:if="${c.minOrderAmount == null}" class="text-muted">None</span>
+            </td>
+            <td>
+              <span th:if="${c.expiryDate != null}">[[${#dates.format(c.expiryDate, 'dd MMM yyyy')}]]</span>
+              <span th:if="${c.expiryDate == null}" class="text-muted">No Expiry</span>
+            </td>
+            <td>
+              <span th:if="${c.isActive}" class="badge bg-success">Active</span>
+              <span th:unless="${c.isActive}" class="badge bg-secondary">Inactive</span>
+            </td>
+            <td>
+              <span class="badge bg-info text-dark fs-6" th:text="${c.usageCount != null ? c.usageCount : 0}"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section></body></html>

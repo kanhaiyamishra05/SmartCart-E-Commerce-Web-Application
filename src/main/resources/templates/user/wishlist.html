@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Wishlist</title>
+</head>
+<body>
+	<section>
+		<div class="container mt-5 p-5">
+			<div class="card card-sh">
+				<div class="card-header text-center">
+					<p class="fs-4">My Wishlist</p>
+					<div th:if="${session.succMsg}" class="alert alert-success">
+						[[${session.succMsg}]]
+						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+					</div>
+					<div th:if="${session.errorMsg}" class="alert alert-danger">
+						[[${session.errorMsg}]]
+						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+					</div>
+				</div>
+				<div class="card-body">
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Sl No</th>
+								<th scope="col">Image</th>
+								<th scope="col">Product Name</th>
+								<th scope="col">Price</th>
+								<th scope="col">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="w,c:${wishlists}">
+								<th scope="row">[[${c.count}]]</th>
+								<td><img th:src="@{'/img/product_img/'+${w.product.image}}"
+									width="70px" height="70px"></td>
+								<td>[[${w.product.title}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${w.product.discountPrice}]]</td>
+								<td>
+									<a th:href="@{'/product/'+${w.product.id}}" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-eye"></i> View</a>
+									<a th:href="@{'/user/delete-wishlist?pid='+${w.product.id}}" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i> Remove</a>
+								</td>
+							</tr>
+							<tr th:if="${wishlists.size() == 0}">
+								<td colspan="5" class="text-center text-muted fs-5 py-4">Your wishlist is empty.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

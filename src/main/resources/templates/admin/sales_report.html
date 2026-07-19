@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Sales Report</title>
+</head>
+<body>
+	<section>
+		<div class="container mt-5 p-5">
+			<p class="text-center fs-3 mt-4"><i class="fa-solid fa-chart-pie text-primary"></i> Sales & Revenue Report</p>
+			
+			<!-- KPI Cards -->
+			<div class="row mb-5 text-start mt-4">
+				<div class="col-md-4">
+					<div class="card bg-primary text-white card-sh">
+						<div class="card-body text-center">
+							<i class="fa-solid fa-indian-rupee-sign fa-2x mb-2"></i>
+							<h5>Total Revenue</h5>
+							<h3><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${totalRevenue}]]</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card bg-success text-white card-sh">
+						<div class="card-body text-center">
+							<i class="fa-solid fa-cart-shopping fa-2x mb-2"></i>
+							<h5>Total Orders</h5>
+							<h3>[[${totalOrders}]]</h3>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card bg-warning text-white card-sh">
+						<div class="card-body text-center">
+							<i class="fa-solid fa-users fa-2x mb-2"></i>
+							<h5>Registered Users</h5>
+							<h3>[[${totalUsers}]]</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Chart.js Section -->
+			<div class="row text-start">
+				<div class="col-md-12">
+					<div class="card card-sh">
+						<div class="card-header text-center fw-bold fs-5">
+							<i class="fa-solid fa-chart-bar text-primary"></i> Monthly Sales Analytics (Revenue)
+						</div>
+						<div class="card-body">
+							<canvas id="salesChart" style="max-height: 400px;"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Include Chart.js and fetch/render code -->
+			<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+			<script>
+				document.addEventListener("DOMContentLoaded", function() {
+					fetch('/admin/sales-stats')
+						.then(response => response.json())
+						.then(data => {
+							const monthlySales = data.monthlySales;
+							const labels = Object.keys(monthlySales);
+							const values = Object.values(monthlySales);
+
+							const ctx = document.getElementById('salesChart').getContext('2d');
+							new Chart(ctx, {
+								type: 'bar',
+								data: {
+									labels: labels,
+									datasets: [{
+										label: 'Monthly Revenue (INR)',
+										data: values,
+										backgroundColor: 'rgba(41, 128, 185, 0.8)',
+										borderColor: 'rgba(41, 128, 185, 1)',
+										borderWidth: 1,
+										borderRadius: 5
+									}]
+								},
+								options: {
+									responsive: true,
+									scales: {
+										y: {
+											beginAtZero: true,
+											ticks: {
+												callback: function(value) {
+													return '₹' + value;
+												}
+											}
+										}
+									}
+								}
+							});
+						});
+				});
+			</script>
+		</div>
+	</section>
+</body>
+</html>

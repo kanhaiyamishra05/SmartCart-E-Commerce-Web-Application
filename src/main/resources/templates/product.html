@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<section>
+	
+		<div class="container-fluid bg-primary p-4 mt-5 ">
+			<div class="row">
+				<div class="col-md-8 offset-md-2">
+					<form action="/products" method="get">
+						<div class="input-group">
+							<input type="text" class="form-control" name="ch">
+							<button class="btn btn-light text-dark ms-3 col-md-2">
+								<i class="fa-solid fa-magnifying-glass"></i> Search
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+
+
+		<div class="container-fluid mt-1">
+			<div class="row">
+
+				<div class="col-md-2 p-0">
+
+					<div class="card shadow-sm p-0 mb-5 bg-body-tertiary rounded">
+						<div class="card-body">
+							<div class="list-group">
+								<p class="fs-5">Category</p>
+								<a th:href="@{'/products?category=&maxPrice=' + ${maxPrice != null ? maxPrice : ''} + '&sortBy=' + ${sortBy != null ? sortBy : ''}}"
+									th:classappend="${paramValue==''} ? 'active':''"
+									class="list-group-item list-group-item-action"
+									aria-current="true"> All </a> <a th:each="c:${categories}"
+									th:href="@{'/products?category='+${c.name} + '&maxPrice=' + ${maxPrice != null ? maxPrice : ''} + '&sortBy=' + ${sortBy != null ? sortBy : ''}}"
+									th:classappend="${paramValue == c.name} ? 'active':''"
+									class="list-group-item list-group-item-action">[[${c.name}]]</a>
+							</div>
+							<hr>
+							<p class="fs-5 mt-3">Filter by Price</p>
+							<form action="/products" method="get">
+								<input type="hidden" name="category" th:value="${paramValue}">
+								<input type="hidden" name="sortBy" th:value="${sortBy}">
+								<div class="mb-3">
+									<label for="priceRange" class="form-label">Max Price: <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> <span id="priceVal">[[${maxPrice != null ? maxPrice : 50000}]]</span></label>
+									<input type="range" class="form-range" min="0" max="100000" step="500" name="maxPrice" id="priceRange" th:value="${maxPrice != null ? maxPrice : 50000}" oninput="document.getElementById('priceVal').innerText=this.value">
+								</div>
+								<button type="submit" class="btn btn-sm btn-primary w-100">Apply Filter</button>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-10">
+					<div class="card">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-center mb-3">
+								<p class="fs-3 mb-0">Products</p>
+								<form action="/products" method="get" class="d-flex align-items-center">
+									<input type="hidden" name="category" th:value="${paramValue}">
+									<input type="hidden" name="maxPrice" th:value="${maxPrice}">
+									<label class="me-2 text-nowrap mb-0">Sort By:</label>
+									<select name="sortBy" class="form-select form-select-sm" onchange="this.form.submit()">
+										<option value="default" th:selected="${sortBy == 'default' || sortBy == null}">Default</option>
+										<option value="priceAsc" th:selected="${sortBy == 'priceAsc'}">Price: Low to High</option>
+										<option value="priceDesc" th:selected="${sortBy == 'priceDesc'}">Price: High to Low</option>
+										<option value="newest" th:selected="${sortBy == 'newest'}">Newest Arrivals</option>
+									</select>
+								</form>
+							</div>
+							<div class="row">
+
+								<th:block th:if="${productsSize >0}">
+									<div class="col-md-3 mt-2" th:each="p:${products}">
+										<div class="card card-sh">
+											<div class="card-body text-center">
+												<img alt="" th:src="@{'/img/product_img/'+${p.image}}"
+													width="150px" height="150px">
+												<p class="fs-5 text-center">[[${p.title}]]</p>
+												<div class="row text-center">
+													<p class="fs-6 fw-bold ">
+														<span><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(p.discountPrice, 1, 2)}]]</span> <br> <span
+															class="text-decoration-line-through text-secondary"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+															[[${p.price}]]</span> <span class="fs-6 text-success">[[${p.discount}]]%
+															off </span>
+													</p>
+													<a th:href="@{'/product/'+${p.id}}"
+														class="btn btn-primary col-md-6 offset-md-3">View
+														Details</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</th:block>
+								<th:block th:unless="${productsSize>0}">
+									<p class="fs-4 text-center mt-4 text-danger">Product not
+										available</p>
+								</th:block>
+							</div>
+
+						</div>
+					</div>
+					<!-- Start Pagination -->
+					<div class="row">
+						<div class="col-md-4">Total Products : [[${totalElements}]]</div>
+						<div class="col-md-6">
+							<th:block th:if="${productsSize>0}">
+								<nav aria-label="Page navigation example">
+									<ul class="pagination">
+										<li class="page-item"
+											th:classappend="${isFirst} ? 'disabled':''"><a
+											class="page-link"
+											th:href="@{'/products?pageNo='+${pageNo-1} + '&category=' + ${paramValue} + '&maxPrice=' + ${maxPrice != null ? maxPrice : ''} + '&sortBy=' + ${sortBy != null ? sortBy : ''}}"
+											aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+										</a></li>
+
+										<li th:each="i:${#numbers.sequence(1,totalPages)}"
+											class="page-item" th:classappend="${pageNo+1==i}?'active':''"><a class="page-link"
+											th:href="@{'/products?pageNo='+${i-1} + '&category=' + ${paramValue} + '&maxPrice=' + ${maxPrice != null ? maxPrice : ''} + '&sortBy=' + ${sortBy != null ? sortBy : ''}}">[[${i}]]</a></li>
+
+										<li class="page-item"
+											th:classappend="${isLast} ? 'disabled':''"><a
+											class="page-link"
+											th:href="@{'/products?pageNo='+${pageNo+1} + '&category=' + ${paramValue} + '&maxPrice=' + ${maxPrice != null ? maxPrice : ''} + '&sortBy=' + ${sortBy != null ? sortBy : ''}}"
+											aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+										</a></li>
+									</ul>
+								</nav>
+						</div>
+						</th:block>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</section>
+</body>
+</html>

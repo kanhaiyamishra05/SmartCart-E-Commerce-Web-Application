@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<section>
+
+		<div class="container mt-5 p-5">
+			<div th:if="${session.succMsg}" class="alert alert-success text-center alert-dismissible fade show" role="alert">
+				[[${session.succMsg}]]
+				<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+			</div>
+			<div th:if="${session.errorMsg}" class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+				[[${session.errorMsg}]]
+				<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+			</div>
+
+			<!-- Coupon Apply Form -->
+			<div class="card p-3 mb-4 bg-light shadow-sm" th:if="${orderPrice != null}">
+				<form action="/user/apply-coupon" method="post" class="row g-3 align-items-center mb-2">
+					<input type="hidden" name="orderAmount" th:value="${orderPrice}">
+					<div class="col-auto">
+						<label class="form-label fw-bold mb-0"><i class="fa-solid fa-tags text-primary"></i> Have a Coupon?</label>
+					</div>
+					<div class="col-auto">
+						<input type="text" name="code" class="form-control form-control-sm" placeholder="Enter Coupon Code" th:value="${session.couponCode}">
+					</div>
+					<div class="col-auto">
+						<button type="submit" class="btn btn-sm btn-success">Apply Coupon</button>
+					</div>
+					<div class="col-auto" th:if="${session.couponCode != null}">
+						<span class="text-success fw-bold"><i class="fa-solid fa-circle-check"></i> Applied!</span>
+					</div>
+				</form>
+				
+				<!-- List of available coupons -->
+				<div class="mt-2 border-top pt-2" th:if="${activeCoupons != null && activeCoupons.size() > 0}">
+					<span class="small fw-bold text-secondary">Available Coupons (Click to apply):</span>
+					<div class="d-flex flex-wrap gap-2 mt-1">
+						<span th:each="coupon:${activeCoupons}" class="badge bg-white text-primary border border-primary p-2" style="border-style: dashed !important; cursor: pointer;"
+							  th:onclick="|document.getElementsByName('code')[0].value='${coupon.code}'|">
+							<i class="fa-solid fa-tag text-danger"></i> <strong th:text="${coupon.code}"></strong> - <span th:text="${coupon.discountPercentage}"></span>% Off (Min: ₹<span th:text="${coupon.minOrderAmount}"></span>)
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<form action="/user/save-order" method="post" id="orders" novalidate>
+				<div class="row">
+
+					<div class="col-md-6">
+
+
+						<div class="mb-3 row">
+							<p class="text-center fs-4">Billing Address</p>
+							<hr>
+							<div class="col p-1">
+								<label>First Name</label> <input type="text" name="firstName" required
+									class="form-control mt-1">
+							</div>
+							<div class="col p-1">
+								<label>Last Name</label> <input type="text" name="lastName" required
+									class="form-control mt-1">
+							</div>
+						</div>
+
+						<div class="mb-3 row">
+							<div class="col p-1">
+								<label>Email</label> <input type="email" name="email" required
+									class="form-control col">
+							</div>
+							<div class="col p-1">
+								<label>Mobile Number</label> <input type="text" name="mobileNo" required
+									class="form-control col ms-2">
+							</div>
+						</div>
+
+						<div class="mb-3 row">
+							<div class="col p-1">
+								<label>Address</label> <input type="text" name="address" required
+									class="form-control col">
+							</div>
+							<div class="col p-1">
+								<label>City</label> <input type="text" name="city" required
+									class="form-control col ms-2">
+							</div>
+						</div>
+						<div class="mb-3 row">
+							<div class="col p-1">
+								<label>State</label> <input type="text" name="state" required
+									class="form-control col">
+							</div>
+							<div class="col p-1">
+								<label>Pincode</label> <input type="number" name="pincode" required
+									class="form-control col ms-2">
+							</div>
+						</div>
+						<!-- </form> -->
+
+					</div>
+					<div class="col-md-6">
+						<p class="text-center fs-4">Payment Type</p>
+						<hr>
+						<div class="card">
+							<div class="card-body">
+								<table class="table table-borderless">
+									<tbody>
+										<tr>
+											<td>Total price</td>
+											<td>:</td>
+											<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(orderPrice, 1, 2)}]]</td>
+										</tr>
+										<tr>
+											<td>Delivery Fee</td>
+											<td>:</td>
+											<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> 250</td>
+										</tr>
+
+										<tr>
+											<td>Tax</td>
+											<td>:</td>
+											<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> 100</td>
+										</tr>
+
+										<tr th:if="${session.discount != null}">
+											<td class="text-success">Coupon Discount</td>
+											<td class="text-success">:</td>
+											<td class="text-success">- <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(session.discount, 1, 2)}]]</td>
+										</tr>
+
+										<tr class="border-top fw-bold">
+											<td>Net Payable</td>
+											<td>:</td>
+											<td>
+												<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+												<span th:if="${session.discount != null}">[[${#numbers.formatDecimal(totalOrderPrice - session.discount, 1, 2)}]]</span>
+												<span th:unless="${session.discount != null}">[[${#numbers.formatDecimal(totalOrderPrice, 1, 2)}]]</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="card shadow p-3 mb-5 mt-2 bg-body-tertiary rounded">
+
+							<div class="card-body">
+								<!-- <form action="/login" method="post"> -->
+								<div class="mb-3">
+									<label class="form-label">Select Payment Type</label> <select required
+										name="paymentType" class="form-control">
+										<option value="">--select--</option>
+										<option value="COD">Cash On Delivery</option>
+										<option value="ONLINE">Online Payment</option>
+									</select>
+
+								</div>
+
+								<button class="btn bg-primary text-white col-md-12">Place
+									Order</button>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</form>
+		</div>
+
+		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+		<script>
+			document.getElementById('orders').addEventListener('submit', function(e) {
+				const paymentType = document.getElementsByName('paymentType')[0].value;
+				if (paymentType === 'ONLINE') {
+					// Check form validity first
+					if (!this.checkValidity()) {
+						this.classList.add('was-validated');
+						e.preventDefault();
+						return;
+					}
+					
+					e.preventDefault(); // prevent form submission
+					
+					const netPayable = [[${session.discount != null ? totalOrderPrice - session.discount : totalOrderPrice}]];
+					
+					// Create payment order on server
+					fetch('/user/create-payment-order?amount=' + netPayable, {
+						method: 'POST'
+					})
+					.then(res => res.json())
+					.then(order => {
+						if (order.error) {
+							alert('Failed to create payment order: ' + order.error);
+							return;
+						}
+						
+						const options = {
+							"key": "[[${@environment.getProperty('razorpay.key.id')}]]",
+							"amount": order.amount,
+							"currency": order.currency,
+							"name": "Shopping Cart",
+							"description": "Product Order Payment",
+							"order_id": order.id,
+							"handler": function (response) {
+								// Verify payment signature on server
+								const params = new URLSearchParams();
+								params.append('razorpay_payment_id', response.razorpay_payment_id);
+								params.append('razorpay_order_id', response.razorpay_order_id);
+								params.append('razorpay_signature', response.razorpay_signature);
+								
+								fetch('/user/verify-payment', {
+									method: 'POST',
+									body: params
+								})
+								.then(res => res.json())
+								.then(verifyResult => {
+									if (verifyResult.status === 'success') {
+										// Set payment type selection just to be sure
+										document.getElementsByName('paymentType')[0].value = 'ONLINE';
+										// Submit the actual form to save order details in database
+										document.getElementById('orders').submit();
+									} else {
+										alert('Payment verification failed! Please try again.');
+									}
+								});
+							},
+							"prefill": {
+								"name": document.getElementsByName('firstName')[0].value + ' ' + document.getElementsByName('lastName')[0].value,
+								"email": document.getElementsByName('email')[0].value,
+								"contact": document.getElementsByName('mobileNo')[0].value
+							},
+							"theme": {
+								"color": "#3399cc"
+							}
+						};
+						
+						const rzp = new Razorpay(options);
+						rzp.open();
+					})
+					.catch(err => {
+						console.error(err);
+						alert('An error occurred while initiating the online payment.');
+					});
+				}
+			});
+		</script>
+
+	</section>
+</body>
+</html>

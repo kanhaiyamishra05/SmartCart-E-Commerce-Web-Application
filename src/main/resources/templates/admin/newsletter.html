@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Newsletter</title></head>
+<body><section>
+<div class="container-fluid mt-5 p-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-envelope text-primary"></i> Newsletter</h4>
+  <div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">[[${session.succMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+  <div class="row g-4">
+    <!-- Subscriber Stats -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm text-center p-4">
+        <i class="fa-solid fa-users fa-3x text-primary mb-3"></i>
+        <h2 class="fw-bold text-primary">[[${subscribers.size()}]]</h2>
+        <p class="text-muted mb-0">Active Subscribers</p>
+      </div>
+      <div class="card border-0 shadow-sm mt-3" style="max-height:300px; overflow-y:auto;">
+        <div class="card-header fw-bold">Subscriber Emails</div>
+        <ul class="list-group list-group-flush">
+          <li th:each="sub : ${subscribers}" class="list-group-item small">
+            <i class="fa-solid fa-check-circle text-success me-1"></i> [[${sub.email}]]
+          </li>
+          <li th:if="${subscribers.size() == 0}" class="list-group-item text-muted text-center">No subscribers yet</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Send Newsletter -->
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white fw-bold">Send Newsletter</div>
+        <div class="card-body">
+          <form action="/admin/send-newsletter" method="post">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Subject</label>
+              <input type="text" name="subject" class="form-control" placeholder="e.g. Exclusive Weekend Offer!" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Message (HTML supported)</label>
+              <textarea name="message" class="form-control" rows="8" placeholder="Write your newsletter content here..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary fw-bold w-100" onclick="return confirm('Send newsletter to all [[${subscribers.size()}]] subscribers?')">
+              <i class="fa-solid fa-paper-plane me-2"></i> Send Newsletter
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section></body></html>

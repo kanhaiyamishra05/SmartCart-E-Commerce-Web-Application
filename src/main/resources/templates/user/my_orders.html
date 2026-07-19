@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<section>
+		<div class="container mt-5 p-5">
+			<div class="row">
+				<p class="text-center fs-3">My Orders</p>
+				<th:block th:if="${session.succMsg}">
+					<p class="text-success fw-bold text-center">[[${session.succMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+
+				<th:block th:if="${session.errorMsg}">
+					<p class="text-danger fw-bold text-center">[[${session.errorMsg}]]</p>
+					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+				</th:block>
+				<div class="col-md-12 ">
+
+					<table class="table table-bordered card-sh align-middle">
+						<thead >
+							<tr >
+								<th scope="col">Order Id</th>
+								<th scope="col">Date</th>
+								<th scope="col">Product Details</th>
+								<th scope="col">Price</th>
+								<th scope="col">Status</th>
+								<th scope="col" style="width: 320px;">Tracking</th>
+								<th scope="col">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="o:${orders}">
+								<th scope="row">[[${o.orderId}]]</th>
+								<td>[[${o.orderDate}]]</td>
+								<td>[[${o.product.title}]]</td>
+								<td>Quantity : [[${o.quantity}]] <br>Price :
+									[[${o.price}]] <br>Total Price :[[${o.quantity *
+									o.price}]]
+								</td>
+								<td>
+									<span class="badge bg-info">[[${o.status}]]</span>
+								</td>
+								<td>
+									<div th:if="${o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
+										<!-- Line behind -->
+										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 40%; transform: translateY(-50%); z-index: 0;"></div>
+										<!-- Active Line -->
+										<div class="position-absolute start-0 bg-success" th:style="'height: 3px; top: 40%; transform: translateY(-50%); z-index: 1; width: ' + 
+											(${o.status == 'In Progress' ? '0%' : 
+											(o.status == 'Product Packed' ? '33%' : 
+											(o.status == 'Out for Delivery' ? '66%' : 
+											(o.status == 'Delivered' ? '100%' : '0%')))} )"></div>
+
+										<!-- Step 1: Placed -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 25px; height: 25px;"><i class="fa-solid fa-check text-white fs-6"></i></span>
+											<div style="font-size: 0.7rem;" class="fw-bold">Ordered</div>
+											<div style="font-size: 0.6rem;" class="text-muted">[[${o.orderDate}]]</div>
+										</div>
+										
+										<!-- Step 2: Packed -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
+												th:classappend="${o.packedDate != null ? 'bg-success' : 'bg-secondary'}" style="width: 25px; height: 25px;">
+												<i class="fa-solid fa-box text-white" style="font-size: 10px;" th:if="${o.packedDate == null}"></i>
+												<i class="fa-solid fa-check text-white fs-6" th:if="${o.packedDate != null}"></i>
+											</span>
+											<div style="font-size: 0.7rem;" class="fw-bold">Packed</div>
+											<div style="font-size: 0.6rem;" class="text-muted" th:if="${o.packedDate != null}">[[${o.packedDate}]]</div>
+										</div>
+										
+										<!-- Step 3: Shipped -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
+												th:classappend="${o.shippedDate != null ? 'bg-success' : 'bg-secondary'}" style="width: 25px; height: 25px;">
+												<i class="fa-solid fa-truck text-white" style="font-size: 10px;" th:if="${o.shippedDate == null}"></i>
+												<i class="fa-solid fa-check text-white fs-6" th:if="${o.shippedDate != null}"></i>
+											</span>
+											<div style="font-size: 0.7rem;" class="fw-bold">Shipped</div>
+											<div style="font-size: 0.6rem;" class="text-muted" th:if="${o.shippedDate != null}">[[${o.shippedDate}]]</div>
+										</div>
+
+										<!-- Step 4: Delivered -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
+												th:classappend="${o.deliveredDate != null ? 'bg-success' : 'bg-secondary'}" style="width: 25px; height: 25px;">
+												<i class="fa-solid fa-house-chimney text-white" style="font-size: 10px;" th:if="${o.deliveredDate == null}"></i>
+												<i class="fa-solid fa-check text-white fs-6" th:if="${o.deliveredDate != null}"></i>
+											</span>
+											<div style="font-size: 0.7rem;" class="fw-bold">Delivered</div>
+											<div style="font-size: 0.6rem;" class="text-muted" th:if="${o.deliveredDate != null}">[[${o.deliveredDate}]]</div>
+										</div>
+									</div>
+									<div th:if="${o.status == 'Cancelled'}" class="text-center">
+										<span class="badge bg-danger">Order Cancelled</span>
+									</div>
+								</td>
+								<td>
+							<th:block th:if="${o.status!='Cancelled'}">
+								<a th:href="@{'/user/update-status?id='+${o.id}+'&st=6' }"
+									class="btn btn-sm btn-danger mb-1">Cancel</a>
+							</th:block>
+							<th:block th:unless="${o.status!='Cancelled'}">
+								<a href="#" class="btn btn-sm btn-danger disabled mb-1">Cancel</a>
+							</th:block>
+							<!-- Reorder -->
+							<a th:href="@{'/user/reorder/' + ${o.id}}" class="btn btn-sm btn-success mb-1">
+								<i class="fa-solid fa-rotate-right"></i> Reorder
+							</a>
+							<!-- Return Request (only for Delivered) -->
+							<th:block th:if="${o.status == 'Delivered'}">
+								<button class="btn btn-sm btn-outline-warning mb-1"
+									data-bs-toggle="modal" th:data-bs-target="${'#returnModal-' + o.id}">
+									<i class="fa-solid fa-rotate-left"></i> Return
+								</button>
+								<!-- Return Modal -->
+								<div class="modal fade" th:id="${'returnModal-' + o.id}" tabindex="-1">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title">Return Request — Order #[[${o.id}]]</h5>
+												<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+											</div>
+											<form action="/user/submit-return" method="post">
+												<div class="modal-body">
+													<input type="hidden" name="orderId" th:value="${o.id}">
+													<label class="form-label">Reason for return:</label>
+													<textarea name="reason" class="form-control" rows="3" required placeholder="Describe the reason..."></textarea>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-warning">Submit Return</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</th:block>
+						</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Review Moderation</title></head>
+<body><section>
+<div class="container-fluid mt-5 p-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-star text-warning"></i> Review Moderation</h4>
+  <div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">[[${session.succMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-dark">
+          <tr><th>#</th><th>Product</th><th>User</th><th>Rating</th><th>Comment</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr th:if="${reviews == null || reviews.size() == 0}">
+            <td colspan="8" class="text-center text-muted py-3">No reviews found.</td>
+          </tr>
+          <tr th:each="rv, i : ${reviews}">
+            <td>[[${i.count}]]</td>
+            <td class="fw-semibold small">[[${rv.product.title}]]</td>
+            <td class="small">[[${rv.user.name}]]</td>
+            <td>
+              <span th:each="s : ${#numbers.sequence(1, rv.rating)}" class="text-warning">★</span>
+              <span th:each="s : ${#numbers.sequence(rv.rating + 1, 5)}" class="text-muted">★</span>
+            </td>
+            <td class="small" style="max-width:200px;">[[${rv.comment}]]</td>
+            <td class="small">[[${#dates.format(rv.reviewDate, 'dd MMM yyyy')}]]</td>
+            <td>
+              <span th:if="${rv.isApproved}" class="badge bg-success">Approved</span>
+              <span th:unless="${rv.isApproved}" class="badge bg-danger">Hidden</span>
+            </td>
+            <td>
+              <a th:if="${!rv.isApproved}" th:href="@{'/admin/approve-review/' + ${rv.id}}" class="btn btn-sm btn-success me-1">Approve</a>
+              <a th:if="${rv.isApproved}" th:href="@{'/admin/reject-review/' + ${rv.id}}" class="btn btn-sm btn-warning me-1">Hide</a>
+              <a th:href="@{'/admin/delete-review/' + ${rv.id}}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this review?')">Delete</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section></body></html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Bulk Product Upload</title></head>
+<body><section>
+<div class="container mt-5 pt-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-file-csv text-muted"></i> Bulk Product Upload</h4>
+
+  <div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">[[${session.succMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+  <div th:if="${session.errorMsg}" class="alert alert-danger alert-dismissible fade show">[[${session.errorMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white fw-bold">Upload CSV File</div>
+        <div class="card-body">
+          <form action="/admin/bulk-upload" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Select CSV File</label>
+              <input type="file" name="csvFile" class="form-control" accept=".csv" required>
+              <small class="text-muted">File must be in CSV format. Max 1000 rows recommended.</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">
+              <i class="fa-solid fa-upload me-2"></i> Upload &amp; Import Products
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white fw-bold">CSV Format Guide</div>
+        <div class="card-body">
+          <p class="fw-semibold mb-2">Required columns (in order):</p>
+          <pre class="bg-light p-3 rounded border" style="font-size:0.85rem;">title,description,category,price,stock,discount</pre>
+          <p class="fw-semibold mb-2 mt-3">Example rows:</p>
+          <pre class="bg-light p-3 rounded border" style="font-size:0.82rem;">Cotton T-Shirt,Comfortable casual tee,Men,499,50,10
+Wireless Earbuds,Bluetooth 5.0 earbuds,Electronics,1299,30,15
+Running Shoes,Lightweight sports shoes,Footwear,2499,20,20</pre>
+          <div class="alert alert-info mt-3 mb-0 small">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            <strong>Note:</strong> Product image will default to <code>default.png</code>. Update images via Edit Product after upload.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section></body></html>

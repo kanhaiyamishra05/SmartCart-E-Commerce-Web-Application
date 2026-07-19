@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Return Requests</title></head>
+<body><section>
+<div class="container-fluid mt-5 p-4">
+  <h4 class="fw-bold mb-4"><i class="fa-solid fa-rotate-left text-secondary"></i> Return Requests</h4>
+  <div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">[[${session.succMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-dark">
+          <tr><th>#</th><th>User</th><th>Order ID</th><th>Reason</th><th>Date</th><th>Status</th><th>Admin Note</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr th:if="${returnRequests == null || returnRequests.size() == 0}">
+            <td colspan="8" class="text-center text-muted py-3">No return requests found.</td>
+          </tr>
+          <tr th:each="rr, i : ${returnRequests}">
+            <td>[[${i.count}]]</td>
+            <td>[[${rr.user.name}]]</td>
+            <td>#[[${rr.order.id}]]</td>
+            <td>[[${rr.reason}]]</td>
+            <td>[[${#dates.format(rr.requestDate, 'dd MMM yyyy')}]]</td>
+            <td>
+              <span class="badge"
+                th:classappend="${rr.status == 'APPROVED' ? 'bg-success' : (rr.status == 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark')}"
+                th:text="${rr.status}"></span>
+            </td>
+            <td><small th:text="${rr.adminNote != null ? rr.adminNote : '-'}"></small></td>
+            <td>
+              <form th:action="@{'/admin/update-return/' + ${rr.id}}" method="post" class="d-flex gap-1 align-items-center">
+                <select name="status" class="form-select form-select-sm" style="width:110px;">
+                  <option value="PENDING" th:selected="${rr.status == 'PENDING'}">PENDING</option>
+                  <option value="APPROVED" th:selected="${rr.status == 'APPROVED'}">APPROVED</option>
+                  <option value="REJECTED" th:selected="${rr.status == 'REJECTED'}">REJECTED</option>
+                </select>
+                <input type="text" name="adminNote" class="form-control form-control-sm" placeholder="Note" style="width:100px;">
+                <button type="submit" class="btn btn-sm btn-primary">Save</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section></body></html>

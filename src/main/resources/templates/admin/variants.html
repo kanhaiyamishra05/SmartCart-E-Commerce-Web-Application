@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head><meta charset="UTF-8"><title>Product Variants</title></head>
+<body><section>
+<div class="container mt-5 pt-4">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/admin/products" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i></a>
+    <h4 class="fw-bold mb-0">Product Variants — <span class="text-primary" th:text="${product.title}"></span></h4>
+  </div>
+  <div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">[[${session.succMsg}]]<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+  <div class="row g-4">
+    <!-- Add Variant -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white fw-bold">Add New Variant</div>
+        <div class="card-body">
+          <form th:action="@{'/admin/save-variant/' + ${product.id}}" method="post">
+            <div class="mb-3">
+              <label class="form-label">Variant Type</label>
+              <select name="variantType" class="form-select" required>
+                <option value="">Select Type</option>
+                <option value="Size">Size</option>
+                <option value="Color">Color</option>
+                <option value="Material">Material</option>
+                <option value="Style">Style</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Variant Value</label>
+              <input type="text" name="variantValue" class="form-control" placeholder="e.g. Red, XL, Cotton" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Extra Price (₹)</label>
+              <input type="number" name="extraPrice" class="form-control" value="0" min="0" step="0.01">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Stock for this Variant</label>
+              <input type="number" name="stock" class="form-control" value="0" min="0">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Variant</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Existing Variants -->
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header fw-bold">Existing Variants ([[${variants.size()}]])</div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr><th>Type</th><th>Value</th><th>Extra Price</th><th>Stock</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr th:if="${variants == null || variants.size() == 0}">
+                <td colspan="5" class="text-center text-muted py-3">No variants added yet.</td>
+              </tr>
+              <tr th:each="v : ${variants}">
+                <td><span class="badge bg-secondary">[[${v.variantType}]]</span></td>
+                <td class="fw-semibold">[[${v.variantValue}]]</td>
+                <td>+₹[[${v.extraPrice}]]</td>
+                <td>[[${v.stock}]]</td>
+                <td>
+                  <a th:href="@{'/admin/delete-variant/' + ${v.id} + '/' + ${product.id}}"
+                     class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this variant?')">Delete</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section></body></html>

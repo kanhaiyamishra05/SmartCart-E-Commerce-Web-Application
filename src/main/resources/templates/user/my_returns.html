@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base::layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>My Return Requests</title>
+</head>
+<body>
+<section>
+<div class="container mt-5 pt-4 page-transition">
+	<h4 class="fw-bold mb-4"><i class="fa-solid fa-rotate-left text-warning"></i> My Return Requests</h4>
+
+	<div th:if="${session.succMsg}" class="alert alert-success alert-dismissible fade show">
+		[[${session.succMsg}]] <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+	<div th:if="${session.errorMsg}" class="alert alert-danger alert-dismissible fade show">
+		[[${session.errorMsg}]] <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+
+	<div th:if="${returnRequests == null || returnRequests.size() == 0}" class="text-center py-5 text-muted">
+		<i class="fa-solid fa-box-open fa-3x mb-3"></i>
+		<h6>No return requests submitted yet.</h6>
+		<a href="/user/user-orders" class="btn btn-outline-primary btn-sm mt-2">View My Orders</a>
+	</div>
+
+	<div class="card shadow-sm border-0" th:if="${returnRequests != null && returnRequests.size() > 0}">
+		<div class="card-body p-0">
+			<table class="table table-hover mb-0">
+				<thead class="table-light">
+					<tr>
+						<th>#</th>
+						<th>Order ID</th>
+						<th>Reason</th>
+						<th>Requested On</th>
+						<th>Status</th>
+						<th>Admin Note</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="rr, i : ${returnRequests}">
+						<td>[[${i.count}]]</td>
+						<td>#[[${rr.order.id}]]</td>
+						<td>[[${rr.reason}]]</td>
+						<td>[[${#dates.format(rr.requestDate, 'dd MMM yyyy')}]]</td>
+						<td>
+							<span th:class="${'badge status-badge-' + rr.status}" th:text="${rr.status}"></span>
+						</td>
+						<td><span th:text="${rr.adminNote != null ? rr.adminNote : '-'}"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="mt-4">
+		<a href="/user/user-orders" class="btn btn-outline-secondary btn-sm">
+			<i class="fa-solid fa-arrow-left me-1"></i> Back to Orders
+		</a>
+	</div>
+</div>
+</section>
+</body>
+</html>
