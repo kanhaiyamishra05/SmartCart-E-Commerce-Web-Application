@@ -15,13 +15,13 @@
     <div class="col-md-4">
       <div class="card border-0 shadow-sm text-center p-3">
         <h5 class="text-muted mb-1">Total Uses</h5>
-        <h3 class="fw-bold text-success" th:text="${coupons.stream().mapToInt(c -> c.usageCount != null ? c.usageCount : 0).sum()}">0</h3>
+        <h3 class="fw-bold text-success" th:text="${totalUses}">0</h3>
       </div>
     </div>
     <div class="col-md-4">
       <div class="card border-0 shadow-sm text-center p-3">
         <h5 class="text-muted mb-1">Active Coupons</h5>
-        <h3 class="fw-bold text-warning" th:text="${coupons.stream().filter(c -> c.isActive).count()}">0</h3>
+        <h3 class="fw-bold text-warning" th:text="${activeCouponCount}">0</h3>
       </div>
     </div>
   </div>

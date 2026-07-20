@@ -41,7 +41,7 @@
 					<span class="small fw-bold text-secondary">Available Coupons (Click to apply):</span>
 					<div class="d-flex flex-wrap gap-2 mt-1">
 						<span th:each="coupon:${activeCoupons}" class="badge bg-white text-primary border border-primary p-2" style="border-style: dashed !important; cursor: pointer;"
-							  th:onclick="|document.getElementsByName('code')[0].value='${coupon.code}'|">
+							  th:attr="data-coupon-code=${coupon.code}" onclick="applyCouponCode(this)">
 							<i class="fa-solid fa-tag text-danger"></i> <strong th:text="${coupon.code}"></strong> - <span th:text="${coupon.discountPercentage}"></span>% Off (Min: ₹<span th:text="${coupon.minOrderAmount}"></span>)
 						</span>
 					</div>
@@ -172,6 +172,10 @@
 
 		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 		<script>
+			function applyCouponCode(coupon) {
+				document.getElementsByName('code')[0].value = coupon.dataset.couponCode;
+			}
+
 			document.getElementById('orders').addEventListener('submit', function(e) {
 				const paymentType = document.getElementsByName('paymentType')[0].value;
 				if (paymentType === 'ONLINE') {

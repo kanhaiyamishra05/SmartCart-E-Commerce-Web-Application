@@ -41,7 +41,7 @@
 				<tbody>
 					<tr th:each="rr, i : ${returnRequests}">
 						<td>[[${i.count}]]</td>
-						<td>#[[${rr.order.id}]]</td>
+						<td>#[[${rr.order.orderId}]]</td>
 						<td>[[${rr.reason}]]</td>
 						<td>[[${#dates.format(rr.requestDate, 'dd MMM yyyy')}]]</td>
 						<td>

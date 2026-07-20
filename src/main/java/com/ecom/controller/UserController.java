@@ -21,6 +21,7 @@ import com.ecom.model.Category;
 import com.ecom.model.OrderRequest;
 import com.ecom.model.ProductOrder;
 import com.ecom.model.UserDtls;
+import com.ecom.repository.ProductOrderRepository;
 import com.ecom.repository.UserRepository;
 import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
@@ -49,6 +50,9 @@ public class UserController {
 
 	@Autowired
 	private OrderService orderService;
+
+	@Autowired
+	private ProductOrderRepository productOrderRepository;
 
 	@Autowired
 	private CommonUtil commonUtil;
@@ -177,7 +181,12 @@ public class UserController {
 	public String myOrder(Model m, Principal p) {
 		UserDtls loginUser = getLoggedInUserDetails(p);
 		List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
+		java.util.Map<Integer, com.ecom.model.ReturnRequest> returnRequestByOrderId = returnRequestRepository
+				.findByUserId(loginUser.getId()).stream()
+				.collect(java.util.stream.Collectors.toMap(request -> request.getOrder().getId(),
+						request -> request, (first, second) -> first));
 		m.addAttribute("orders", orders);
+		m.addAttribute("returnRequestByOrderId", returnRequestByOrderId);
 		return "/user/my_orders";
 	}
 
@@ -394,8 +403,8 @@ public class UserController {
 	public String submitReturn(@RequestParam Integer orderId, @RequestParam String reason,
 			Principal p, HttpSession session) {
 		UserDtls user = getLoggedInUserDetails(p);
-		com.ecom.model.ProductOrder order = orderService.getOrdersByOrderId(orderId.toString());
-		if (order != null) {
+		com.ecom.model.ProductOrder order = productOrderRepository.findById(orderId).orElse(null);
+		if (order != null && order.getUser().getId().equals(user.getId())) {
 			com.ecom.model.ReturnRequest rr = new com.ecom.model.ReturnRequest();
 			rr.setOrder(order);
 			rr.setUser(user);
@@ -407,7 +416,7 @@ public class UserController {
 		} else {
 			session.setAttribute("errorMsg", "Order not found!");
 		}
-		return "redirect:/user/user-orders";
+		return "redirect:/user/my-returns";
 	}
 
 	// ============ GIFT CARD REDEMPTION ============

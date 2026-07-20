@@ -46,7 +46,11 @@
 									<span class="badge bg-info">[[${o.status}]]</span>
 								</td>
 								<td>
-									<div th:if="${o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
+									<div th:if="${returnRequestByOrderId.containsKey(o.id)}" class="text-center py-2">
+										<span class="badge bg-warning text-dark">Return Requested</span>
+										<div class="small mt-1">Status: <strong th:text="${returnRequestByOrderId.get(o.id).status}"></strong></div>
+									</div>
+									<div th:if="${!returnRequestByOrderId.containsKey(o.id) && o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
 										<!-- Line behind -->
 										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 40%; transform: translateY(-50%); z-index: 0;"></div>
 										<!-- Active Line -->
@@ -96,7 +100,7 @@
 											<div style="font-size: 0.6rem;" class="text-muted" th:if="${o.deliveredDate != null}">[[${o.deliveredDate}]]</div>
 										</div>
 									</div>
-									<div th:if="${o.status == 'Cancelled'}" class="text-center">
+									<div th:if="${!returnRequestByOrderId.containsKey(o.id) && o.status == 'Cancelled'}" class="text-center">
 										<span class="badge bg-danger">Order Cancelled</span>
 									</div>
 								</td>
@@ -113,7 +117,7 @@
 								<i class="fa-solid fa-rotate-right"></i> Reorder
 							</a>
 							<!-- Return Request (only for Delivered) -->
-							<th:block th:if="${o.status == 'Delivered'}">
+							<th:block th:if="${o.status == 'Delivered' && !returnRequestByOrderId.containsKey(o.id)}">
 								<button class="btn btn-sm btn-outline-warning mb-1"
 									data-bs-toggle="modal" th:data-bs-target="${'#returnModal-' + o.id}">
 									<i class="fa-solid fa-rotate-left"></i> Return

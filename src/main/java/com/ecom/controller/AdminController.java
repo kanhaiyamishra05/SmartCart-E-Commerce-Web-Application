@@ -729,7 +729,17 @@ public class AdminController {
 	// ============ COUPON USAGE REPORT ============
 	@GetMapping("/coupon-report")
 	public String couponReport(Model m) {
-		m.addAttribute("coupons", couponService.getAllCoupons());
+		List<Coupon> coupons = couponService.getAllCoupons();
+		int totalUses = coupons.stream()
+				.mapToInt(coupon -> coupon.getUsageCount() == null ? 0 : coupon.getUsageCount())
+				.sum();
+		long activeCouponCount = coupons.stream()
+				.filter(coupon -> Boolean.TRUE.equals(coupon.getIsActive()))
+				.count();
+
+		m.addAttribute("coupons", coupons);
+		m.addAttribute("totalUses", totalUses);
+		m.addAttribute("activeCouponCount", activeCouponCount);
 		return "admin/coupon_report";
 	}
 
