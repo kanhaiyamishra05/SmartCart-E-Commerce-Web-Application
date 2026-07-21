@@ -836,8 +836,8 @@ public class AdminController {
 				p.setDiscount(discount);
 				Double discountAmt = price * (discount / 100.0);
 				p.setDiscountPrice(Math.round((price - discountAmt) * 100.0) / 100.0);
-				p.setIsActive(true);
-				p.setImage("default.png");
+				String image = (parts.length >= 7 && !parts[6].trim().isEmpty()) ? parts[6].trim() : "default.jpg";
+				p.setImage(image);
 				productService.saveProduct(p);
 				saved++;
 			}

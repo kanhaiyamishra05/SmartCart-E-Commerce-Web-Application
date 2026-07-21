@@ -31,15 +31,15 @@
       <div class="card shadow-sm border-0">
         <div class="card-header bg-dark text-white fw-bold">CSV Format Guide</div>
         <div class="card-body">
-          <p class="fw-semibold mb-2">Required columns (in order):</p>
-          <pre class="bg-light p-3 rounded border" style="font-size:0.85rem;">title,description,category,price,stock,discount</pre>
-          <p class="fw-semibold mb-2 mt-3">Example rows:</p>
-          <pre class="bg-light p-3 rounded border" style="font-size:0.82rem;">Cotton T-Shirt,Comfortable casual tee,Men,499,50,10
-Wireless Earbuds,Bluetooth 5.0 earbuds,Electronics,1299,30,15
-Running Shoes,Lightweight sports shoes,Footwear,2499,20,20</pre>
+          <p class="fw-semibold mb-2">CSV Columns (in order):</p>
+          <pre class="bg-light p-3 rounded border" style="font-size:0.85rem;">title,description,category,price,stock,discount,image</pre>
+          <p class="fw-semibold mb-2 mt-3">Example CSV rows:</p>
+          <pre class="bg-light p-3 rounded border" style="font-size:0.82rem;">HP Pavilion Laptop,Intel Core i5 16GB RAM,Electronics,55000,45,10,laptop.jpg
+iPhone 14 Pro,Apple iPhone 128GB,Mobile Phones,95000,50,12,iphone 14.jpg
+Slim Fit Blue Jeans,Stretch denim jeans,Apparel,2499,150,10,jeans blue.jfif</pre>
           <div class="alert alert-info mt-3 mb-0 small">
             <i class="fa-solid fa-circle-info me-1"></i>
-            <strong>Note:</strong> Product image will default to <code>default.png</code>. Update images via Edit Product after upload.
+            <strong>Image Details:</strong> Specify the image filename (e.g. <code>laptop.jpg</code>) in 7th column. Ensure the image file exists in project path: <code>src/main/resources/static/img/product_img/</code> or update via Edit Product page.
           </div>
         </div>
       </div>
