@@ -197,23 +197,28 @@
 
 	<!-- Chatbot Widget -->
 	<button id="chatbot-btn" onclick="toggleChatbot()" title="Chat with us">
-		<i class="fa-solid fa-comment-dots" id="chatbot-icon"></i>
+		<i class="fa-solid fa-robot" id="chatbot-icon"></i>
 	</button>
 	<div id="chatbot-window">
 		<div class="chatbot-header">
-			<span><i class="fa-solid fa-robot me-2"></i> Ecom Assistant</span>
+			<span><i class="fa-solid fa-robot me-2"></i> SmartCart AI Assistant</span>
 			<button class="btn-close btn-close-white" onclick="toggleChatbot()"></button>
 		</div>
 		<div class="chatbot-messages" id="chat-messages">
-			<div class="chat-msg bot">👋 Hi! I'm your shopping assistant. How can I help you today?</div>
+			<div class="chat-msg bot">👋 Namaste! I am your AI Shopping Assistant. Ask me anything about orders, returns, payments, coupons, or products!</div>
 		</div>
 		<div class="chatbot-quick-replies" id="quick-replies">
-			<button class="quick-reply-btn" onclick="sendMsg('Track my order')">Track Order</button>
-			<button class="quick-reply-btn" onclick="sendMsg('Return policy')">Returns</button>
-			<button class="quick-reply-btn" onclick="sendMsg('Payment options')">Payment</button>
-			<button class="quick-reply-btn" onclick="sendMsg('Offers and coupons')">Offers</button>
-			<button class="quick-reply-btn" onclick="sendMsg('Contact support')">Contact</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Track my order')">📦 Track Order</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Return policy')">🔄 Returns</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Payment options')">💳 Payment</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Active coupons')">🏷️ Coupons</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Loyalty points')">🎁 Rewards</button>
+			<button class="quick-reply-btn" onclick="sendMsg('Contact support')">📞 Help</button>
 		</div>
+		<form onsubmit="handleChatSubmit(event)" class="d-flex p-2 border-top bg-light">
+			<input type="text" id="chat-input" class="form-control form-control-sm me-1" placeholder="Type any question here..." autocomplete="off">
+			<button type="submit" class="btn btn-primary btn-sm px-3"><i class="fa-solid fa-paper-plane"></i></button>
+		</form>
 	</div>
 
 	<!-- PWA Manifest -->
@@ -290,31 +295,106 @@
 		}
 	});
 
-	// ===== CHATBOT =====
-	const faqAnswers = {
-		'track my order': '📦 You can track your order by going to <a href="/user/user-orders">My Orders</a>. Order status updates are shown there.',
-		'return policy': '🔄 We offer 7-day easy returns. Go to <a href="/user/my-returns">My Returns</a> to submit a return request.',
-		'payment options': '💳 We accept Cash on Delivery (COD) and Online Payments via Razorpay (UPI, Cards, Net Banking).',
-		'offers and coupons': '🏷️ Check out <a href="/user/offers">Offers Page</a> for all active coupon codes!',
-		'contact support': '📧 Email us at support@ecomstore.com or call 1800-XXX-XXXX (Mon-Sat, 9AM-6PM).',
-		'default': "🤔 I'm not sure about that. Please contact us at support@ecomstore.com for more help!"
-	};
-
+	// ===== SMART AI CHATBOT ENGINE =====
 	function toggleChatbot() {
 		const win = document.getElementById('chatbot-window');
 		win.classList.toggle('open');
+		if (win.classList.contains('open')) {
+			const input = document.getElementById('chat-input');
+			if (input) input.focus();
+		}
+	}
+
+	function handleChatSubmit(e) {
+		e.preventDefault();
+		const input = document.getElementById('chat-input');
+		const text = input.value.trim();
+		if (text) {
+			sendMsg(text);
+			input.value = '';
+		}
 	}
 
 	function sendMsg(text) {
 		const msgs = document.getElementById('chat-messages');
-		msgs.innerHTML += '<div class="chat-msg user">' + text + '</div>';
-		const key = text.toLowerCase();
-		const answer = faqAnswers[key] || faqAnswers['default'];
-		setTimeout(() => {
-			msgs.innerHTML += '<div class="chat-msg bot">' + answer + '</div>';
-			msgs.scrollTop = msgs.scrollHeight;
-		}, 500);
+		msgs.innerHTML += '<div class="chat-msg user">' + escapeHtml(text) + '</div>';
 		msgs.scrollTop = msgs.scrollHeight;
+
+		const typingId = 'typing-' + Date.now();
+		msgs.innerHTML += '<div class="chat-msg bot" id="' + typingId + '"><i class="fa-solid fa-circle-notch fa-spin me-1"></i> Thinking...</div>';
+		msgs.scrollTop = msgs.scrollHeight;
+
+		setTimeout(() => {
+			const typingElem = document.getElementById(typingId);
+			if (typingElem) typingElem.remove();
+			
+			const reply = generateSmartReply(text);
+			msgs.innerHTML += '<div class="chat-msg bot">' + reply + '</div>';
+			msgs.scrollTop = msgs.scrollHeight;
+		}, 250);
+	}
+
+	function escapeHtml(str) {
+		return str.replace(/[&<>"']/g, function(m) {
+			return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+		});
+	}
+
+	function generateSmartReply(text) {
+		const q = text.toLowerCase().trim();
+
+		// Greetings
+		if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('namaste') || q.includes('good morning') || q.includes('good evening') || q.includes('kaise')) {
+			return '👋 Hello! Welcome to SmartCart. I am your AI assistant. How can I assist your shopping today?<br><br>💡 <em>Quick Actions:</em> <a href="/products">Browse Products</a> | <a href="/user/offers">View Coupons</a>';
+		}
+		
+		// Order Tracking / Status
+		if (q.includes('track') || q.includes('order') || q.includes('status') || q.includes('delivery') || q.includes('where') || q.includes('shipment') || q.includes('arrive') || q.includes('dispatch') || q.includes('kahan')) {
+			return '📦 <strong>Order Tracking:</strong><br>You can track all your live orders &amp; return progress in real-time on your <a href="/user/user-orders" class="fw-bold">My Orders</a> page.<br><br>🚚 Standard Delivery takes 2-4 business days across India.';
+		}
+
+		// Returns / Refund / Replacement / Cancel
+		if (q.includes('return') || q.includes('refund') || q.includes('replace') || q.includes('exchange') || q.includes('cancel') || q.includes('money back') || q.includes('damage') || q.includes('broken') || q.includes('wapas')) {
+			return '🔄 <strong>Returns &amp; Refunds:</strong><br>We offer a 7-day easy return &amp; refund policy!<br>• Go to <a href="/user/user-orders" class="fw-bold">My Orders</a> and click <strong>Return</strong>.<br>• Track your return status live under <a href="/user/my-returns" class="fw-bold">My Returns</a>.';
+		}
+
+		// Payment / COD / UPI / Cards
+		if (q.includes('payment') || q.includes('pay') || q.includes('cod') || q.includes('cash') || q.includes('upi') || q.includes('card') || q.includes('razorpay') || q.includes('online')) {
+			return '💳 <strong>Payment Options:</strong><br>We support:<br>• 💵 <strong>Cash on Delivery (COD)</strong><br>• ⚡ <strong>Razorpay Online Payment</strong> (GPay, PhonePe, Paytm, All Cards, Netbanking).<br><br>All online transactions are 100% encrypted and secure!';
+		}
+
+		// Coupons / Offers / Discount / Promo
+		if (q.includes('coupon') || q.includes('offer') || q.includes('discount') || q.includes('promo') || q.includes('code') || q.includes('deal') || q.includes('sale') || q.includes('save')) {
+			return '🏷️ <strong>Exclusive Deals &amp; Coupons:</strong><br>Check out active promo codes on our <a href="/user/offers" class="fw-bold">Offers &amp; Coupons Page</a>!<br>⚡ Don\'t miss our Live <a href="/" class="fw-bold">Flash Sales</a> on the homepage!';
+		}
+
+		// Loyalty Points / Referral Rewards
+		if (q.includes('point') || q.includes('reward') || q.includes('loyalty') || q.includes('refer') || q.includes('referral') || q.includes('bonus')) {
+			return '🎁 <strong>SmartCart Rewards &amp; Referral:</strong><br>• Earn <strong>50 Loyalty Points</strong> on new registration!<br>• Share your Referral Code to earn <strong>50 Points</strong> for every friend who joins.<br>• Check your point balance in your <a href="/user/profile" class="fw-bold">Profile</a>.';
+		}
+
+		// Gift Cards / Vouchers
+		if (q.includes('gift') || q.includes('voucher')) {
+			return '🎁 <strong>Gift Cards:</strong><br>You can redeem Gift Cards directly on your <a href="/user/profile" class="fw-bold">Profile Page</a> or during Checkout!';
+		}
+
+		// Reorder / Cart / Checkout
+		if (q.includes('cart') || q.includes('reorder') || q.includes('buy') || q.includes('checkout')) {
+			return '🛒 <strong>Shopping &amp; Reordering:</strong><br>• View items in your <a href="/user/cart" class="fw-bold">Cart</a>.<br>• 1-Click Reorder past items from <a href="/user/user-orders" class="fw-bold">My Orders</a>.';
+		}
+
+		// Contact & Customer Support / Help
+		if (q.includes('contact') || q.includes('support') || q.includes('help') || q.includes('phone') || q.includes('call') || q.includes('email') || q.includes('agent') || q.includes('number')) {
+			return '📞 <strong>Customer Support:</strong><br>• Email: <strong>support@ecomstore.com</strong><br>• Helpline: <strong>1800-123-4567</strong> (Mon-Sat, 9AM-7PM)<br>• Live Support Address: SmartCart Head Office, New Delhi.';
+		}
+
+		// Products & Search
+		if (q.includes('product') || q.includes('search') || q.includes('laptop') || q.includes('mobile') || q.includes('shirt') || q.includes('shoe') || q.includes('fridge') || q.includes('category')) {
+			return '🔍 <strong>Product Search:</strong><br>Use the Top Search Bar on the navbar with live suggestions, or browse all collections on our <a href="/products" class="fw-bold">All Products Page</a>!';
+		}
+
+		// Smart Fallback for any other custom question
+		return '🤖 I\'m here to help with all your shopping queries!<br>Here are quick links you might need:<br>• 📦 <a href="/user/user-orders">Track Orders</a><br>• 🏷️ <a href="/user/offers">View Coupons</a><br>• 🛍️ <a href="/products">Explore Products</a><br>• 📞 <a href="mailto:support@ecomstore.com">Email Support</a>';
 	}
 	</script>
 </body>
