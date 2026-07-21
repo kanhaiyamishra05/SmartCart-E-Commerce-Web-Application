@@ -148,7 +148,7 @@ public class UserController {
 		} else {
 			m.addAttribute("totalOrderPrice", 0.0);
 		}
-		return "/user/cart";
+		return "user/cart";
 	}
 
 	@GetMapping("/cartQuantityUpdate")
@@ -267,7 +267,7 @@ public class UserController {
 
 	@GetMapping("/success")
 	public String loadSuccess() {
-		return "/user/success";
+		return "user/success";
 	}
 
 	@GetMapping("/user-orders")
@@ -293,7 +293,7 @@ public class UserController {
 		}
 		m.addAttribute("orders", orders);
 		m.addAttribute("returnRequestByOrderId", returnRequestByOrderId);
-		return "/user/my_orders";
+		return "user/my_orders";
 	}
 
 	@GetMapping("/update-status")
@@ -326,7 +326,7 @@ public class UserController {
 
 	@GetMapping("/profile")
 	public String profile() {
-		return "/user/profile";
+		return "user/profile";
 	}
 
 	@PostMapping("/update-profile")
