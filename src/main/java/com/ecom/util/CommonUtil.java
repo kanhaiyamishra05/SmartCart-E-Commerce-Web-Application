@@ -1,9 +1,11 @@
 package com.ecom.util;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,22 @@ public class CommonUtil {
 
 	@Autowired
 	private com.ecom.service.InvoiceService invoiceService;
+
+	public static File getUploadDir() {
+		try {
+			File file = new ClassPathResource("static/img").getFile();
+			if (file.exists()) {
+				return file;
+			}
+		} catch (Exception e) {
+			// ClassPathResource.getFile() fails inside packaged JAR / Docker cloud deployments
+		}
+		File fallback = new File("uploads/img");
+		if (!fallback.exists()) {
+			fallback.mkdirs();
+		}
+		return fallback;
+	}
 
 	public Boolean sendMail(String url, String reciepentEmail) {
 		try {
@@ -102,6 +120,7 @@ public class CommonUtil {
 	}
 	
 	public UserDtls getLoggedInUserDetails(Principal p) {
+		if (p == null) return null;
 		String email = p.getName();
 		UserDtls userDtls = userService.getUserByEmail(email);
 		return userDtls;

@@ -174,7 +174,7 @@ public class AdminController {
 				session.setAttribute("errorMsg", "Not saved ! internal server error");
 			} else {
 
-				File saveFile = new ClassPathResource("static/img").getFile();
+				File saveFile = com.ecom.util.CommonUtil.getUploadDir();
 
 				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "category_img" + File.separator
 						+ file.getOriginalFilename());
@@ -227,7 +227,7 @@ public class AdminController {
 		if (!ObjectUtils.isEmpty(updateCategory)) {
 
 			if (!file.isEmpty()) {
-				File saveFile = new ClassPathResource("static/img").getFile();
+				File saveFile = com.ecom.util.CommonUtil.getUploadDir();
 
 				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "category_img" + File.separator
 						+ file.getOriginalFilename());
@@ -257,7 +257,7 @@ public class AdminController {
 
 		if (!ObjectUtils.isEmpty(saveProduct)) {
 
-			File saveFile = new ClassPathResource("static/img").getFile();
+			File saveFile = com.ecom.util.CommonUtil.getUploadDir();
 
 			Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator
 					+ image.getOriginalFilename());
@@ -479,7 +479,7 @@ public class AdminController {
 
 		if (!ObjectUtils.isEmpty(saveUser)) {
 			if (!file.isEmpty()) {
-				File saveFile = new ClassPathResource("static/img").getFile();
+				File saveFile = com.ecom.util.CommonUtil.getUploadDir();
 
 				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator
 						+ file.getOriginalFilename());
