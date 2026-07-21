@@ -85,18 +85,46 @@
 				</div>
 
 			</div>
+	<!-- Active Gift Cards Section -->
+	<div class="mt-5 mb-4" th:if="${giftCards != null && giftCards.size() > 0}">
+		<h4 class="fw-bold mb-3"><i class="fa-solid fa-gift text-warning me-2"></i> Active Gift Cards Available</h4>
+		<div class="row g-4">
+			<div class="col-md-4" th:each="gc : ${giftCards}">
+				<div class="card h-100 shadow-sm border-0" style="border-radius:16px; background: linear-gradient(135deg, #11998e, #38ef7d); color: white;">
+					<div class="card-body p-4 d-flex flex-column text-center">
+						<span class="badge bg-white text-success fw-bold mb-2 align-self-center"><i class="fa-solid fa-credit-card me-1"></i> E-GIFT CARD</span>
+						<h2 class="fw-extrabold mb-1">
+							<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(gc.amount, 1, 0)}]]
+						</h2>
+						<p class="small opacity-90 mb-3">Flat Cash Discount Voucher</p>
+						<div class="bg-white text-dark rounded-3 p-2 mb-3 d-flex align-items-center justify-content-between">
+							<span class="fw-bold fs-5 text-success ms-2" th:id="${'gc-code-' + gcStat.index}" th:text="${gc.code}"></span>
+							<button class="btn btn-sm btn-success fw-bold px-3"
+								th:data-target="${'gc-code-' + gcStat.index}"
+								onclick="copyCode(this.getAttribute('data-target'), this)">
+								<i class="fa-solid fa-copy"></i> Copy
+							</button>
+						</div>
+						<small class="opacity-75 mt-auto" th:if="${gc.expiryDate != null}">
+							<i class="fa-solid fa-clock me-1"></i> Valid till: [[${#dates.format(gc.expiryDate, 'dd MMM yyyy')}]]
+						</small>
+					</div>
+				</div>
+			</div>
 		</div>
+	</div>
+
 	<!-- Gift Cards & E-Vouchers Info Section -->
-	<div class="card shadow-sm border-0 rounded-4 mt-5 bg-gradient p-4 text-white" style="background: linear-gradient(135deg, #11998e, #38ef7d);">
+	<div class="card shadow-sm border-0 rounded-4 mt-4 bg-primary p-4 text-white">
 		<div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 			<div>
-				<span class="badge bg-white text-dark fw-bold mb-2"><i class="fa-solid fa-gift text-success me-1"></i> GIFT CARDS &amp; VOUCHERS</span>
-				<h3 class="fw-extrabold mb-1">Have a SmartCart Gift Card?</h3>
-				<p class="mb-0 opacity-90">Redeem your e-gift cards or voucher codes at checkout to get instant flat discounts on any order!</p>
+				<span class="badge bg-warning text-dark fw-bold mb-2"><i class="fa-solid fa-gift me-1"></i> REDEEM GIFT CARD</span>
+				<h3 class="fw-extrabold mb-1">Redeem Gift Cards &amp; Loyalty Points</h3>
+				<p class="mb-0 opacity-90">Enter your Gift Card code during checkout or redeem on your profile for instant discount balance!</p>
 			</div>
 			<div>
-				<a href="/user/profile#loyalty-section" class="btn btn-light text-success fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">
-					<i class="fa-solid fa-credit-card me-1"></i> Redeem Gift Card
+				<a href="/user/profile#loyalty-section" class="btn btn-warning text-dark fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">
+					<i class="fa-solid fa-credit-card me-1"></i> My Rewards Profile
 				</a>
 				<a href="/products" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2">Shop Now</a>
 			</div>

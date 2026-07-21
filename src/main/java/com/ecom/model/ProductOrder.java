@@ -10,15 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
 public class ProductOrder {
 
@@ -57,4 +49,69 @@ public class ProductOrder {
 
 	private LocalDate deliveredDate;
 
+	public ProductOrder() {
+	}
+
+	public ProductOrder(Integer id, String orderId, LocalDate orderDate, Product product, Double price, Integer quantity, UserDtls user, String status, String paymentType, OrderAddress orderAddress, String couponCode, Double discount, LocalDate packedDate, LocalDate shippedDate, LocalDate deliveredDate) {
+		this.id = id;
+		this.orderId = orderId;
+		this.orderDate = orderDate;
+		this.product = product;
+		this.price = price;
+		this.quantity = quantity;
+		this.user = user;
+		this.status = status;
+		this.paymentType = paymentType;
+		this.orderAddress = orderAddress;
+		this.couponCode = couponCode;
+		this.discount = discount;
+		this.packedDate = packedDate;
+		this.shippedDate = shippedDate;
+		this.deliveredDate = deliveredDate;
+	}
+
+	public Integer getId() { return id; }
+	public void setId(Integer id) { this.id = id; }
+
+	public String getOrderId() { return orderId; }
+	public void setOrderId(String orderId) { this.orderId = orderId; }
+
+	public LocalDate getOrderDate() { return orderDate; }
+	public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
+
+	public Product getProduct() { return product; }
+	public void setProduct(Product product) { this.product = product; }
+
+	public Double getPrice() { return price; }
+	public void setPrice(Double price) { this.price = price; }
+
+	public Integer getQuantity() { return quantity; }
+	public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+	public UserDtls getUser() { return user; }
+	public void setUser(UserDtls user) { this.user = user; }
+
+	public String getStatus() { return status; }
+	public void setStatus(String status) { this.status = status; }
+
+	public String getPaymentType() { return paymentType; }
+	public void setPaymentType(String paymentType) { this.paymentType = paymentType; }
+
+	public OrderAddress getOrderAddress() { return orderAddress; }
+	public void setOrderAddress(OrderAddress orderAddress) { this.orderAddress = orderAddress; }
+
+	public String getCouponCode() { return couponCode; }
+	public void setCouponCode(String couponCode) { this.couponCode = couponCode; }
+
+	public Double getDiscount() { return discount; }
+	public void setDiscount(Double discount) { this.discount = discount; }
+
+	public LocalDate getPackedDate() { return packedDate; }
+	public void setPackedDate(LocalDate packedDate) { this.packedDate = packedDate; }
+
+	public LocalDate getShippedDate() { return shippedDate; }
+	public void setShippedDate(LocalDate shippedDate) { this.shippedDate = shippedDate; }
+
+	public LocalDate getDeliveredDate() { return deliveredDate; }
+	public void setDeliveredDate(LocalDate deliveredDate) { this.deliveredDate = deliveredDate; }
 }

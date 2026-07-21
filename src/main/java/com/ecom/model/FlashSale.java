@@ -1,22 +1,13 @@
 package com.ecom.model;
 
 import java.util.Date;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
 public class FlashSale {
 
@@ -24,10 +15,9 @@ public class FlashSale {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	// Product title or all products
-	private Integer productId; // null = all products
+	private Integer productId;
 
-	private String title; // "Weekend Sale", "Diwali Offer" etc.
+	private String title;
 
 	private Double discountPercentage;
 
@@ -40,4 +30,38 @@ public class FlashSale {
 	private Date endTime;
 
 	private Boolean isActive;
+
+	public FlashSale() {
+	}
+
+	public FlashSale(Integer id, Integer productId, String title, Double discountPercentage, Date startTime, Date endTime, Boolean isActive) {
+		this.id = id;
+		this.productId = productId;
+		this.title = title;
+		this.discountPercentage = discountPercentage;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.isActive = isActive;
+	}
+
+	public Integer getId() { return id; }
+	public void setId(Integer id) { this.id = id; }
+
+	public Integer getProductId() { return productId; }
+	public void setProductId(Integer productId) { this.productId = productId; }
+
+	public String getTitle() { return title; }
+	public void setTitle(String title) { this.title = title; }
+
+	public Double getDiscountPercentage() { return discountPercentage; }
+	public void setDiscountPercentage(Double discountPercentage) { this.discountPercentage = discountPercentage; }
+
+	public Date getStartTime() { return startTime; }
+	public void setStartTime(Date startTime) { this.startTime = startTime; }
+
+	public Date getEndTime() { return endTime; }
+	public void setEndTime(Date endTime) { this.endTime = endTime; }
+
+	public Boolean getIsActive() { return isActive; }
+	public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

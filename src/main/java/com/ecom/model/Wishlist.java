@@ -5,15 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
 public class Wishlist {
 
@@ -27,4 +19,21 @@ public class Wishlist {
 	@ManyToOne
 	private Product product;
 
+	public Wishlist() {
+	}
+
+	public Wishlist(Integer id, UserDtls user, Product product) {
+		this.id = id;
+		this.user = user;
+		this.product = product;
+	}
+
+	public Integer getId() { return id; }
+	public void setId(Integer id) { this.id = id; }
+
+	public UserDtls getUser() { return user; }
+	public void setUser(UserDtls user) { this.user = user; }
+
+	public Product getProduct() { return product; }
+	public void setProduct(Product product) { this.product = product; }
 }

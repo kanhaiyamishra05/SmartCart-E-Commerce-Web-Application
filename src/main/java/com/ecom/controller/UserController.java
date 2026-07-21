@@ -84,10 +84,15 @@ public class UserController {
 		return "user/home";
 	}
 
+	@Autowired
+	private com.ecom.repository.GiftCardRepository giftCardRepository;
+
 	@GetMapping("/offers")
 	public String offersPage(Model m) {
 		List<Coupon> activeCoupons = couponService.getActiveCoupons();
 		m.addAttribute("activeCoupons", activeCoupons);
+		java.util.List<com.ecom.model.GiftCard> giftCards = giftCardRepository.findByIsUsedFalse();
+		m.addAttribute("giftCards", giftCards);
 		return "user/offers";
 	}
 
@@ -425,9 +430,6 @@ public class UserController {
 	}
 
 	// ============ GIFT CARD REDEMPTION ============
-	@Autowired
-	private com.ecom.repository.GiftCardRepository giftCardRepository;
-
 	@PostMapping("/apply-gift-card")
 	public String applyGiftCard(@RequestParam String giftCode, HttpSession session) {
 		com.ecom.model.GiftCard gc = giftCardRepository.findByCodeAndIsUsedFalse(giftCode.trim().toUpperCase());

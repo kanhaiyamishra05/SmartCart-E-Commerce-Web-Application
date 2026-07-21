@@ -6,4 +6,5 @@ import com.ecom.model.GiftCard;
 public interface GiftCardRepository extends JpaRepository<GiftCard, Integer> {
 	GiftCard findByCode(String code);
 	GiftCard findByCodeAndIsUsedFalse(String code);
+	java.util.List<GiftCard> findByIsUsedFalse();
 }

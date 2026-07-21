@@ -27,6 +27,9 @@ public class DataSeeder implements CommandLineRunner {
 	@Autowired
 	private com.ecom.repository.ProductReviewRepository productReviewRepository;
 
+	@Autowired
+	private com.ecom.repository.GiftCardRepository giftCardRepository;
+
 	@Value("${app.admin.email}")
 	private String adminEmail;
 
@@ -159,6 +162,16 @@ public class DataSeeder implements CommandLineRunner {
 				}
 				System.out.println("Seeded initial approved customer reviews.");
 			}
+		}
+
+		// Seed initial Gift Cards if empty
+		if (giftCardRepository.count() == 0) {
+			java.util.Calendar cal = java.util.Calendar.getInstance();
+			cal.add(java.util.Calendar.MONTH, 6);
+			giftCardRepository.save(new com.ecom.model.GiftCard(null, "GIFT200", 200.0, false, null, cal.getTime(), new java.util.Date()));
+			giftCardRepository.save(new com.ecom.model.GiftCard(null, "WELCOME500", 500.0, false, null, cal.getTime(), new java.util.Date()));
+			giftCardRepository.save(new com.ecom.model.GiftCard(null, "FESTIVE1000", 1000.0, false, null, cal.getTime(), new java.util.Date()));
+			System.out.println("Seeded initial Gift Cards.");
 		}
 	}
 }

@@ -1,21 +1,10 @@
 package com.ecom.model;
 
-import java.util.Date;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Entity
 public class ProductVariant {
 
@@ -25,13 +14,41 @@ public class ProductVariant {
 
 	private Integer productId;
 
-	// e.g. "Size", "Color"
 	private String variantType;
 
-	// e.g. "Large", "Red"
 	private String variantValue;
 
 	private Double extraPrice = 0.0;
 
 	private Integer stock = 0;
+
+	public ProductVariant() {
+	}
+
+	public ProductVariant(Integer id, Integer productId, String variantType, String variantValue, Double extraPrice, Integer stock) {
+		this.id = id;
+		this.productId = productId;
+		this.variantType = variantType;
+		this.variantValue = variantValue;
+		this.extraPrice = extraPrice;
+		this.stock = stock;
+	}
+
+	public Integer getId() { return id; }
+	public void setId(Integer id) { this.id = id; }
+
+	public Integer getProductId() { return productId; }
+	public void setProductId(Integer productId) { this.productId = productId; }
+
+	public String getVariantType() { return variantType; }
+	public void setVariantType(String variantType) { this.variantType = variantType; }
+
+	public String getVariantValue() { return variantValue; }
+	public void setVariantValue(String variantValue) { this.variantValue = variantValue; }
+
+	public Double getExtraPrice() { return extraPrice; }
+	public void setExtraPrice(Double extraPrice) { this.extraPrice = extraPrice; }
+
+	public Integer getStock() { return stock; }
+	public void setStock(Integer stock) { this.stock = stock; }
 }
