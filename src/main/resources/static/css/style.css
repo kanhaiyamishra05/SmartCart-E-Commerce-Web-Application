@@ -373,3 +373,119 @@
 	from { opacity: 0; transform: translateY(8px); }
 	to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== HOMEPAGE STYLES ===== */
+.hero-slider-img {
+	height: 420px;
+	object-fit: cover;
+	filter: brightness(0.85);
+}
+
+.hero-overlay-content {
+	position: absolute;
+	top: 50%;
+	left: 8%;
+	transform: translateY(-50%);
+	color: white;
+	z-index: 5;
+	max-width: 550px;
+	text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.trust-feature-card {
+	background: var(--bg-card, #ffffff);
+	border: 1px solid var(--border-color, #eef2f7);
+	border-radius: 12px;
+	padding: 20px 15px;
+	transition: all 0.25s ease;
+}
+
+.trust-feature-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+
+.home-category-card {
+	background: var(--bg-card, #ffffff);
+	border-radius: 16px;
+	border: 1px solid var(--border-color, #f0f0f0);
+	transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.home-category-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 28px rgba(13, 110, 253, 0.15) !important;
+	border-color: #0d6efd !important;
+}
+
+.home-product-card {
+	background: var(--bg-card, #ffffff);
+	border-radius: 14px;
+	border: 1px solid var(--border-color, #eef2f7);
+	transition: all 0.3s ease;
+	overflow: hidden;
+}
+
+.home-product-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 14px 30px rgba(0,0,0,0.12) !important;
+}
+
+.product-img-wrapper {
+	position: relative;
+	overflow: hidden;
+	height: 200px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fbfbfb;
+	padding: 15px;
+}
+
+[data-theme="dark"] .product-img-wrapper {
+	background: #1e1e1e;
+}
+
+.product-img-wrapper img {
+	max-height: 170px;
+	width: auto;
+	object-fit: contain;
+	transition: transform 0.35s ease;
+}
+
+.home-product-card:hover .product-img-wrapper img {
+	transform: scale(1.08);
+}
+
+.discount-tag {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	background: #dc3545;
+	color: white;
+	font-weight: 700;
+	font-size: 0.72rem;
+	padding: 3px 8px;
+	border-radius: 6px;
+	z-index: 2;
+}
+
+.reward-banner {
+	background: linear-gradient(135deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+	border-radius: 16px;
+	color: white;
+	padding: 35px 25px;
+	box-shadow: 0 10px 30px rgba(200, 80, 192, 0.3);
+}
+
+.testimonial-card {
+	background: var(--bg-card, #ffffff);
+	border-radius: 14px;
+	border: 1px solid var(--border-color, #f0f0f0);
+	padding: 24px;
+	transition: transform 0.25s ease;
+}
+
+.testimonial-card:hover {
+	transform: translateY(-4px);
+}
