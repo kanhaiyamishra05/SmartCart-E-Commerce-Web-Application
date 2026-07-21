@@ -86,6 +86,9 @@ public class AdminController {
 	@Autowired
 	private com.ecom.repository.ProductVariantRepository productVariantRepository;
 
+	@Autowired
+	private com.ecom.repository.ProductOrderRepository productOrderRepository;
+
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
 		if (p != null) {
@@ -634,6 +637,22 @@ public class AdminController {
 			rr.setStatus(status);
 			rr.setAdminNote(adminNote);
 			returnRequestRepository.save(rr);
+
+			// Update associated ProductOrder status
+			com.ecom.model.ProductOrder order = rr.getOrder();
+			if (order != null) {
+				if ("APPROVED".equalsIgnoreCase(status)) {
+					order.setStatus("Return Approved");
+				} else if ("REFUNDED".equalsIgnoreCase(status)) {
+					order.setStatus("Returned & Refunded");
+				} else if ("REJECTED".equalsIgnoreCase(status)) {
+					order.setStatus("Return Rejected");
+				} else if ("PENDING".equalsIgnoreCase(status)) {
+					order.setStatus("Return Requested");
+				}
+				productOrderRepository.save(order);
+			}
+
 			session.setAttribute("succMsg", "Return request " + status + "!");
 		}
 		return "redirect:/admin/returns";

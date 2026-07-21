@@ -24,15 +24,16 @@
             <td>[[${#dates.format(rr.requestDate, 'dd MMM yyyy')}]]</td>
             <td>
               <span class="badge"
-                th:classappend="${rr.status == 'APPROVED' ? 'bg-success' : (rr.status == 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark')}"
+                th:classappend="${rr.status == 'REFUNDED' ? 'bg-success' : (rr.status == 'APPROVED' ? 'bg-primary' : (rr.status == 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark'))}"
                 th:text="${rr.status}"></span>
             </td>
             <td><small th:text="${rr.adminNote != null ? rr.adminNote : '-'}"></small></td>
             <td>
               <form th:action="@{'/admin/update-return/' + ${rr.id}}" method="post" class="d-flex gap-1 align-items-center">
-                <select name="status" class="form-select form-select-sm" style="width:110px;">
+                <select name="status" class="form-select form-select-sm" style="width:120px;">
                   <option value="PENDING" th:selected="${rr.status == 'PENDING'}">PENDING</option>
                   <option value="APPROVED" th:selected="${rr.status == 'APPROVED'}">APPROVED</option>
+                  <option value="REFUNDED" th:selected="${rr.status == 'REFUNDED'}">REFUNDED</option>
                   <option value="REJECTED" th:selected="${rr.status == 'REJECTED'}">REJECTED</option>
                 </select>
                 <input type="text" name="adminNote" class="form-control form-control-sm" placeholder="Note" style="width:100px;">

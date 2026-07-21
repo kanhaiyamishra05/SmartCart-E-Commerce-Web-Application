@@ -412,11 +412,16 @@ public class UserController {
 			rr.setStatus("PENDING");
 			rr.setRequestDate(new java.util.Date());
 			returnRequestRepository.save(rr);
+
+			// Update ProductOrder status
+			order.setStatus("Return Requested");
+			productOrderRepository.save(order);
+
 			session.setAttribute("succMsg", "Return request submitted successfully!");
 		} else {
 			session.setAttribute("errorMsg", "Order not found!");
 		}
-		return "redirect:/user/my-returns";
+		return "redirect:/user/user-orders";
 	}
 
 	// ============ GIFT CARD REDEMPTION ============

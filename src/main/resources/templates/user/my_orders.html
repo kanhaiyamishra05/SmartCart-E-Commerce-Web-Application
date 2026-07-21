@@ -29,7 +29,7 @@
 								<th scope="col">Product Details</th>
 								<th scope="col">Price</th>
 								<th scope="col">Status</th>
-								<th scope="col" style="width: 320px;">Tracking</th>
+								<th scope="col" style="width: 360px;">Tracking</th>
 								<th scope="col">Action</th>
 							</tr>
 						</thead>
@@ -43,13 +43,71 @@
 									o.price}]]
 								</td>
 								<td>
-									<span class="badge bg-info">[[${o.status}]]</span>
+									<th:block th:if="${returnRequestByOrderId.containsKey(o.id)}">
+										<span th:if="${returnRequestByOrderId.get(o.id).status == 'PENDING'}" class="badge bg-warning text-dark"><i class="fa-solid fa-rotate-left"></i> Return Requested</span>
+										<span th:if="${returnRequestByOrderId.get(o.id).status == 'APPROVED'}" class="badge bg-primary"><i class="fa-solid fa-check me-1"></i>Return Approved</span>
+										<span th:if="${returnRequestByOrderId.get(o.id).status == 'REFUNDED'}" class="badge bg-success"><i class="fa-solid fa-hand-holding-dollar me-1"></i>Returned &amp; Refunded</span>
+										<span th:if="${returnRequestByOrderId.get(o.id).status == 'REJECTED'}" class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i>Return Rejected</span>
+									</th:block>
+									<th:block th:unless="${returnRequestByOrderId.containsKey(o.id)}">
+										<span class="badge bg-info">[[${o.status}]]</span>
+									</th:block>
 								</td>
 								<td>
-									<div th:if="${returnRequestByOrderId.containsKey(o.id)}" class="text-center py-2">
-										<span class="badge bg-warning text-dark">Return Requested</span>
-										<div class="small mt-1">Status: <strong th:text="${returnRequestByOrderId.get(o.id).status}"></strong></div>
+									<!-- Return Tracking Timeline -->
+									<div th:if="${returnRequestByOrderId.containsKey(o.id)}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
+										<!-- Line behind -->
+										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 35%; transform: translateY(-50%); z-index: 0;"></div>
+										<!-- Active Line -->
+										<div class="position-absolute start-0" th:classappend="${returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-success'}" 
+											th:style="'height: 3px; top: 35%; transform: translateY(-50%); z-index: 1; width: ' + 
+											(${returnRequestByOrderId.get(o.id).status == 'PENDING' ? '50%' : 
+											(returnRequestByOrderId.get(o.id).status == 'APPROVED' ? '75%' : 
+											(returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? '100%' : '100%'))})"></div>
+
+										<!-- Step 1: Ordered -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;"><i class="fa-solid fa-check text-white" style="font-size: 10px;"></i></span>
+											<div style="font-size: 0.65rem;" class="fw-bold">Ordered</div>
+											<div style="font-size: 0.55rem;" class="text-muted">[[${o.orderDate}]]</div>
+										</div>
+
+										<!-- Step 2: Delivered -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;"><i class="fa-solid fa-house-chimney text-white" style="font-size: 10px;"></i></span>
+											<div style="font-size: 0.65rem;" class="fw-bold">Delivered</div>
+											<div style="font-size: 0.55rem;" class="text-muted" th:if="${o.deliveredDate != null}">[[${o.deliveredDate}]]</div>
+										</div>
+
+										<!-- Step 3: Return Requested -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;"><i class="fa-solid fa-rotate-left text-white" style="font-size: 10px;"></i></span>
+											<div style="font-size: 0.65rem;" class="fw-bold text-warning">Return Req</div>
+											<div style="font-size: 0.55rem;" class="text-muted" th:if="${returnRequestByOrderId.get(o.id).requestDate != null}">[[${#dates.format(returnRequestByOrderId.get(o.id).requestDate, 'yyyy-MM-dd')}]]</div>
+										</div>
+
+										<!-- Step 4: Approved / Rejected -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
+												th:classappend="${returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? 'bg-success' : (returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-secondary')}" style="width: 24px; height: 24px;">
+												<i class="fa-solid fa-check text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED'}"></i>
+												<i class="fa-solid fa-xmark text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id).status == 'REJECTED'}"></i>
+												<i class="fa-solid fa-clock text-white" style="font-size: 9px;" th:if="${returnRequestByOrderId.get(o.id).status == 'PENDING'}"></i>
+											</span>
+											<div style="font-size: 0.65rem;" class="fw-bold" th:text="${returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'Rejected' : 'Approved'}">Approved</div>
+										</div>
+
+										<!-- Step 5: Refunded -->
+										<div class="text-center" style="z-index: 2;">
+											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
+												th:classappend="${returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? 'bg-success' : 'bg-secondary'}" style="width: 24px; height: 24px;">
+												<i class="fa-solid fa-hand-holding-dollar text-white" style="font-size: 10px;"></i>
+											</span>
+											<div style="font-size: 0.65rem;" class="fw-bold">Refunded</div>
+										</div>
 									</div>
+
+									<!-- Standard Order Tracking Timeline -->
 									<div th:if="${!returnRequestByOrderId.containsKey(o.id) && o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
 										<!-- Line behind -->
 										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 40%; transform: translateY(-50%); z-index: 0;"></div>
@@ -116,7 +174,13 @@
 							<a th:href="@{'/user/reorder/' + ${o.id}}" class="btn btn-sm btn-success mb-1">
 								<i class="fa-solid fa-rotate-right"></i> Reorder
 							</a>
-							<!-- Return Request (only for Delivered) -->
+							<!-- Return Submitted Indicator or Return Button -->
+							<th:block th:if="${returnRequestByOrderId.containsKey(o.id)}">
+								<button class="btn btn-sm btn-outline-secondary mb-1" disabled>
+									<i class="fa-solid fa-rotate-left me-1"></i> Return Active
+								</button>
+							</th:block>
+							<!-- Return Request (only for Delivered and not yet returned) -->
 							<th:block th:if="${o.status == 'Delivered' && !returnRequestByOrderId.containsKey(o.id)}">
 								<button class="btn btn-sm btn-outline-warning mb-1"
 									data-bs-toggle="modal" th:data-bs-target="${'#returnModal-' + o.id}">
