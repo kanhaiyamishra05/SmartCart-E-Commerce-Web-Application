@@ -147,8 +147,11 @@ public class UserController {
 		return userDtls;
 	}
 
+	@Autowired
+	private com.ecom.repository.UserRepository userRepository;
+
 	@GetMapping("/orders")
-	public String orderPage(Principal p, Model m) {
+	public String orderPage(Principal p, Model m, HttpSession session) {
 		UserDtls user = getLoggedInUserDetails(p);
 		List<Cart> carts = cartService.getCartsByUser(user.getId());
 		m.addAttribute("carts", carts);
@@ -156,10 +159,26 @@ public class UserController {
 			Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
 			Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
 			m.addAttribute("orderPrice", orderPrice);
+
+			Double couponDiscount = (Double) session.getAttribute("discount");
+			Double giftCardAmount = (Double) session.getAttribute("giftCardAmount");
+			Double loyaltyDiscount = (Double) session.getAttribute("loyaltyDiscount");
+
+			Double totalDiscount = 0.0;
+			if (couponDiscount != null) totalDiscount += couponDiscount;
+			if (giftCardAmount != null) totalDiscount += giftCardAmount;
+			if (loyaltyDiscount != null) totalDiscount += loyaltyDiscount;
+
+			m.addAttribute("totalDiscount", totalDiscount);
 			m.addAttribute("totalOrderPrice", totalOrderPrice);
+			m.addAttribute("finalPayable", Math.max(0.0, totalOrderPrice - totalDiscount));
 		}
 		List<Coupon> activeCoupons = couponService.getActiveCoupons();
 		m.addAttribute("activeCoupons", activeCoupons);
+
+		java.util.List<com.ecom.model.GiftCard> giftCards = giftCardRepository.findByIsUsedFalse();
+		m.addAttribute("giftCards", giftCards);
+
 		return "/user/order";
 	}
 
@@ -167,12 +186,47 @@ public class UserController {
 	public String saveOrder(@ModelAttribute OrderRequest request, Principal p, HttpSession session) throws Exception {
 		UserDtls user = getLoggedInUserDetails(p);
 		String couponCode = (String) session.getAttribute("couponCode");
-		Double discount = (Double) session.getAttribute("discount");
+		String giftCardCode = (String) session.getAttribute("giftCardCode");
+		Integer loyaltyPointsToRedeem = (Integer) session.getAttribute("loyaltyPointsToRedeem");
 
-		orderService.saveOrder(user.getId(), request, couponCode, discount);
+		Double couponDiscount = (Double) session.getAttribute("discount");
+		Double giftCardAmount = (Double) session.getAttribute("giftCardAmount");
+		Double loyaltyDiscount = (Double) session.getAttribute("loyaltyDiscount");
+
+		Double totalDiscount = 0.0;
+		if (couponDiscount != null) totalDiscount += couponDiscount;
+		if (giftCardAmount != null) totalDiscount += giftCardAmount;
+		if (loyaltyDiscount != null) totalDiscount += loyaltyDiscount;
+
+		StringBuilder promoSummary = new StringBuilder();
+		if (couponCode != null) promoSummary.append("Coupon:").append(couponCode).append(" ");
+		if (giftCardCode != null) promoSummary.append("GiftCard:").append(giftCardCode).append(" ");
+		if (loyaltyPointsToRedeem != null) promoSummary.append("Points:").append(loyaltyPointsToRedeem);
+
+		orderService.saveOrder(user.getId(), request, promoSummary.toString().trim(), totalDiscount);
+
+		if (giftCardCode != null) {
+			com.ecom.model.GiftCard gc = giftCardRepository.findByCodeAndIsUsedFalse(giftCardCode);
+			if (gc != null) {
+				gc.setIsUsed(true);
+				gc.setUsedByUserId(user.getId());
+				giftCardRepository.save(gc);
+			}
+		}
+
+		int current = user.getLoyaltyPoints() == null ? 0 : user.getLoyaltyPoints();
+		if (loyaltyPointsToRedeem != null && loyaltyPointsToRedeem > 0) {
+			current = Math.max(0, current - loyaltyPointsToRedeem);
+		}
+		user.setLoyaltyPoints(current + 10);
+		userRepository.save(user);
 
 		session.removeAttribute("couponCode");
 		session.removeAttribute("discount");
+		session.removeAttribute("giftCardCode");
+		session.removeAttribute("giftCardAmount");
+		session.removeAttribute("loyaltyPointsToRedeem");
+		session.removeAttribute("loyaltyDiscount");
 
 		return "redirect:/user/success";
 	}
