@@ -17,4 +17,6 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, In
 	List<ProductReview> findByIsApprovedFalse();
 
 	List<ProductReview> findAllByOrderByReviewDateDesc();
+
+	List<ProductReview> findTop6ByIsApprovedTrueOrderByReviewDateDesc();
 }

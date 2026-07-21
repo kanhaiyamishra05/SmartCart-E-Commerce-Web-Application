@@ -24,6 +24,9 @@ public class DataSeeder implements CommandLineRunner {
 	@Autowired
 	private com.ecom.repository.ProductRepository productRepository;
 
+	@Autowired
+	private com.ecom.repository.ProductReviewRepository productReviewRepository;
+
 	@Value("${app.admin.email}")
 	private String adminEmail;
 
@@ -140,6 +143,21 @@ public class DataSeeder implements CommandLineRunner {
 				System.out.println("==================================================");
 				System.out.println("Admin Account Status Synchronized/Unlocked on Startup");
 				System.out.println("==================================================");
+			}
+		}
+
+		// Seed initial approved customer reviews if empty
+		if (productReviewRepository.count() == 0) {
+			java.util.List<com.ecom.model.Product> productsList = productRepository.findAll();
+			if (admin != null && !productsList.isEmpty()) {
+				productReviewRepository.save(new com.ecom.model.ProductReview(null, admin, productsList.get(0), 5, "Excellent build quality & super fast shipping! Very satisfied.", new java.util.Date(), true));
+				if (productsList.size() > 1) {
+					productReviewRepository.save(new com.ecom.model.ProductReview(null, admin, productsList.get(1), 5, "Great deal! Got it during the flash sale, packaging was top-notch.", new java.util.Date(), true));
+				}
+				if (productsList.size() > 2) {
+					productReviewRepository.save(new com.ecom.model.ProductReview(null, admin, productsList.get(2), 4, "Value for money product. Delivery was on time and support was helpful.", new java.util.Date(), true));
+				}
+				System.out.println("Seeded initial approved customer reviews.");
 			}
 		}
 	}

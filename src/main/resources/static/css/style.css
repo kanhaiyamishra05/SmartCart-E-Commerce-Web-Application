@@ -378,7 +378,7 @@
 .hero-slider-img {
 	height: 420px;
 	object-fit: cover;
-	filter: brightness(0.85);
+	filter: none !important;
 }
 
 .hero-overlay-content {
@@ -386,10 +386,14 @@
 	top: 50%;
 	left: 8%;
 	transform: translateY(-50%);
-	color: white;
+	color: #ffffff;
 	z-index: 5;
 	max-width: 550px;
-	text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+	background: rgba(0, 0, 0, 0.45);
+	backdrop-filter: blur(8px);
+	padding: 30px;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .trust-feature-card {

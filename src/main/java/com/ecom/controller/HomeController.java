@@ -70,6 +70,9 @@ public class HomeController {
 	@Autowired
 	private com.ecom.service.CouponService couponService;
 
+	@Autowired
+	private com.ecom.repository.ProductReviewRepository productReviewRepository;
+
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
 		if (p != null) {
@@ -100,6 +103,10 @@ public class HomeController {
 		// Active flash sales
 		java.util.List<com.ecom.model.FlashSale> flashSales = flashSaleRepository.findByIsActiveTrueAndEndTimeAfter(new java.util.Date());
 		m.addAttribute("flashSales", flashSales);
+
+		// Real approved customer reviews for homepage
+		java.util.List<com.ecom.model.ProductReview> reviews = productReviewRepository.findTop6ByIsApprovedTrueOrderByReviewDateDesc();
+		m.addAttribute("reviews", reviews);
 
 		return "index";
 	}
