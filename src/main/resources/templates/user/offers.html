@@ -49,7 +49,8 @@
 								th:text="${coupon.code}">
 							</span>
 							<button class="btn btn-sm btn-outline-primary"
-									th:onclick="|copyCode('code-' + ${couponStat.index}, this)|"
+									th:data-target="${'code-' + couponStat.index}"
+									onclick="copyCode(this.getAttribute('data-target'), this)"
 									title="Copy Code">
 								<i class="fa-solid fa-copy"></i>
 							</button>

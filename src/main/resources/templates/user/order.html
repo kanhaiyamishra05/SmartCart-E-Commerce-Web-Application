@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Checkout - Shopping Cart</title>
 </head>
 <body>
 	<section>
@@ -41,7 +41,7 @@
 					<span class="small fw-bold text-secondary">Available Coupons (Click to apply):</span>
 					<div class="d-flex flex-wrap gap-2 mt-1">
 						<span th:each="coupon:${activeCoupons}" class="badge bg-white text-primary border border-primary p-2" style="border-style: dashed !important; cursor: pointer;"
-							  th:attr="data-coupon-code=${coupon.code}" onclick="applyCouponCode(this)">
+							  th:data-coupon-code="${coupon.code}" onclick="applyCouponCode(this)">
 							<i class="fa-solid fa-tag text-danger"></i> <strong th:text="${coupon.code}"></strong> - <span th:text="${coupon.discountPercentage}"></span>% Off (Min: ₹<span th:text="${coupon.minOrderAmount}"></span>)
 						</span>
 					</div>
@@ -52,7 +52,6 @@
 				<div class="row">
 
 					<div class="col-md-6">
-
 
 						<div class="mb-3 row">
 							<p class="text-center fs-4">Billing Address</p>
@@ -98,7 +97,6 @@
 									class="form-control col ms-2">
 							</div>
 						</div>
-						<!-- </form> -->
 
 					</div>
 					<div class="col-md-6">
@@ -148,7 +146,6 @@
 						<div class="card shadow p-3 mb-5 mt-2 bg-body-tertiary rounded">
 
 							<div class="card-body">
-								<!-- <form action="/login" method="post"> -->
 								<div class="mb-3">
 									<label class="form-label">Select Payment Type</label> <select required
 										name="paymentType" class="form-control">
@@ -159,8 +156,7 @@
 
 								</div>
 
-								<button class="btn bg-primary text-white col-md-12">Place
-									Order</button>
+								<button class="btn bg-primary text-white col-md-12">Place Order</button>
 
 							</div>
 						</div>
@@ -172,14 +168,17 @@
 
 		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 		<script>
-			function applyCouponCode(coupon) {
-				document.getElementsByName('code')[0].value = coupon.dataset.couponCode;
+			function applyCouponCode(el) {
+				const code = el.getAttribute('data-coupon-code') || (el.dataset ? el.dataset.couponCode : '');
+				const input = document.getElementsByName('code')[0];
+				if (input) {
+					input.value = code;
+				}
 			}
 
 			document.getElementById('orders').addEventListener('submit', function(e) {
 				const paymentType = document.getElementsByName('paymentType')[0].value;
 				if (paymentType === 'ONLINE') {
-					// Check form validity first
 					if (!this.checkValidity()) {
 						this.classList.add('was-validated');
 						e.preventDefault();
@@ -190,7 +189,6 @@
 					
 					const netPayable = [[${session.discount != null ? totalOrderPrice - session.discount : totalOrderPrice}]];
 					
-					// Create payment order on server
 					fetch('/user/create-payment-order?amount=' + netPayable, {
 						method: 'POST'
 					})
@@ -209,7 +207,6 @@
 							"description": "Product Order Payment",
 							"order_id": order.id,
 							"handler": function (response) {
-								// Verify payment signature on server
 								const params = new URLSearchParams();
 								params.append('razorpay_payment_id', response.razorpay_payment_id);
 								params.append('razorpay_order_id', response.razorpay_order_id);
@@ -222,9 +219,7 @@
 								.then(res => res.json())
 								.then(verifyResult => {
 									if (verifyResult.status === 'success') {
-										// Set payment type selection just to be sure
 										document.getElementsByName('paymentType')[0].value = 'ONLINE';
-										// Submit the actual form to save order details in database
 										document.getElementById('orders').submit();
 									} else {
 										alert('Payment verification failed! Please try again.');
