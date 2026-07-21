@@ -203,7 +203,7 @@ public class UserController {
 		java.util.List<com.ecom.model.GiftCard> giftCards = giftCardRepository.findByIsUsedFalse();
 		m.addAttribute("giftCards", giftCards != null ? giftCards : new java.util.ArrayList<>());
 
-		return "/user/order";
+		return "user/order";
 	}
 
 	@PostMapping("/save-order")
@@ -609,7 +609,10 @@ public class UserController {
 	@GetMapping("/buy-now")
 	public String buyNow(@RequestParam Integer pid, Principal p) {
 		UserDtls user = getLoggedInUserDetails(p);
-		cartService.saveCart(pid, user.getId());
+		if (user == null) return "redirect:/signin";
+		if (pid != null && user.getId() != null) {
+			cartService.saveCart(pid, user.getId());
+		}
 		return "redirect:/user/orders";
 	}
 
