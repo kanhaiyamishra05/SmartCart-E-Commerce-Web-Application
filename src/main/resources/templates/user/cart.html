@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Cart Page</title>
 </head>
 <body>
 	<section>
@@ -23,7 +23,7 @@
 					</th:block>
 				</div>
 				<div class="card-body">
-					<table class="table">
+					<table class="table align-middle">
 						<thead>
 							<tr>
 								<th scope="col">Sl No</th>
@@ -38,29 +38,33 @@
 							<tr th:each="cart,c:${carts}">
 								<th scope="row">[[${c.count}]]</th>
 								<td><img
-									th:src="@{'/img/product_img/'+${cart.product.image}}"
-									width="70px" height="70px"></td>
-								<td>[[${cart.product.title}]]</td>
-								<td>[[${#numbers.formatDecimal(cart.product.discountPrice, 1, 2)}]]</td>
+									th:src="@{'/img/product_img/'+${cart.product != null ? cart.product.image : 'default.jpg'}}"
+									width="70px" height="70px" style="object-fit: contain;"></td>
+								<td>[[${cart.product != null ? cart.product.title : 'Product'}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(cart.product != null && cart.product.discountPrice != null ? cart.product.discountPrice : (cart.product != null && cart.product.price != null ? cart.product.price : 0), 1, 2)}]]</td>
 								<td class="text-center"><a
 									th:href="@{'/user/cartQuantityUpdate?sy=de&cid='+${cart.id}}">
 										<i class="fa-solid fa-minus"></i>
-								</a> [ [[${cart.quantity}]] ] <a
+								</a> [ [[${cart.quantity != null ? cart.quantity : 1}]] ] <a
 									th:href="@{'/user/cartQuantityUpdate?sy=in&cid='+${cart.id}}">
 										<i class="fa-solid fa-plus"></i>
 								</a></td>
-								<td>[[${#numbers.formatDecimal(cart.totalPrice, 1, 2)}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(cart.totalPrice != null ? cart.totalPrice : 0, 1, 2)}]]</td>
 							</tr>
 							<tr>
 								<td colspan="4"></td>
 								<td class="fw-bold">Total Price</td>
-								<td class="fw-bold"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(totalOrderPrice, 1, 2)}]]</td>
+								<td class="fw-bold"><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(totalOrderPrice != null ? totalOrderPrice : 0, 1, 2)}]]</td>
 							</tr>
 
 						</tbody>
 					</table>
-					<div class="text-center">
+					<div class="text-center" th:if="${carts != null && carts.size() > 0}">
 						<a href="/user/orders" class="btn btn-warning"> Proceed Payment</a>
+					</div>
+					<div class="text-center p-4" th:if="${carts == null || carts.size() == 0}">
+						<p class="text-muted fs-5 mb-3">Your cart is empty!</p>
+						<a href="/products" class="btn btn-primary">Start Shopping</a>
 					</div>
 				</div>
 			</div>

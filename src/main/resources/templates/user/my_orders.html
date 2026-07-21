@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>My Orders</title>
 </head>
 <body>
 	<section>
@@ -21,9 +21,9 @@
 				</th:block>
 				<div class="col-md-12 ">
 
-					<table class="table table-bordered card-sh align-middle">
-						<thead >
-							<tr >
+					<table class="table table-bordered card-sh align-middle" th:if="${orders != null && orders.size() > 0}">
+						<thead>
+							<tr>
 								<th scope="col">Order Id</th>
 								<th scope="col">Date</th>
 								<th scope="col">Product Details</th>
@@ -35,35 +35,34 @@
 						</thead>
 						<tbody>
 							<tr th:each="o:${orders}">
-								<th scope="row">[[${o.orderId}]]</th>
+								<th scope="row">[[${o.orderId != null ? o.orderId : o.id}]]</th>
 								<td>[[${o.orderDate}]]</td>
-								<td>[[${o.product.title}]]</td>
-								<td>Quantity : [[${o.quantity}]] <br>Price :
-									[[${o.price}]] <br>Total Price :[[${o.quantity *
-									o.price}]]
+								<td>[[${o.product != null ? o.product.title : 'Product'}]]</td>
+								<td>Quantity : [[${o.quantity != null ? o.quantity : 1}]] <br>Price :
+									<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(o.price != null ? o.price : 0, 1, 2)}]] <br>Total Price : <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal((o.quantity != null ? o.quantity : 1) * (o.price != null ? o.price : 0), 1, 2)}]]
 								</td>
 								<td>
-									<th:block th:if="${returnRequestByOrderId.containsKey(o.id)}">
-										<span th:if="${returnRequestByOrderId.get(o.id).status == 'PENDING'}" class="badge bg-warning text-dark"><i class="fa-solid fa-rotate-left"></i> Return Requested</span>
-										<span th:if="${returnRequestByOrderId.get(o.id).status == 'APPROVED'}" class="badge bg-primary"><i class="fa-solid fa-check me-1"></i>Return Approved</span>
-										<span th:if="${returnRequestByOrderId.get(o.id).status == 'REFUNDED'}" class="badge bg-success"><i class="fa-solid fa-hand-holding-dollar me-1"></i>Returned &amp; Refunded</span>
-										<span th:if="${returnRequestByOrderId.get(o.id).status == 'REJECTED'}" class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i>Return Rejected</span>
+									<th:block th:if="${returnRequestByOrderId != null && returnRequestByOrderId.containsKey(o.id)}">
+										<span th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'PENDING'}" class="badge bg-warning text-dark"><i class="fa-solid fa-rotate-left"></i> Return Requested</span>
+										<span th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'APPROVED'}" class="badge bg-primary"><i class="fa-solid fa-check me-1"></i>Return Approved</span>
+										<span th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REFUNDED'}" class="badge bg-success"><i class="fa-solid fa-hand-holding-dollar me-1"></i>Returned &amp; Refunded</span>
+										<span th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REJECTED'}" class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i>Return Rejected</span>
 									</th:block>
-									<th:block th:unless="${returnRequestByOrderId.containsKey(o.id)}">
-										<span class="badge bg-info">[[${o.status}]]</span>
+									<th:block th:unless="${returnRequestByOrderId != null && returnRequestByOrderId.containsKey(o.id)}">
+										<span class="badge bg-info">[[${o.status != null ? o.status : 'In Progress'}]]</span>
 									</th:block>
 								</td>
 								<td>
 									<!-- Return Tracking Timeline -->
-									<div th:if="${returnRequestByOrderId.containsKey(o.id)}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
+									<div th:if="${returnRequestByOrderId != null && returnRequestByOrderId.containsKey(o.id)}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
 										<!-- Line behind -->
 										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 35%; transform: translateY(-50%); z-index: 0;"></div>
 										<!-- Active Line -->
-										<div class="position-absolute start-0" th:classappend="${returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-success'}" 
+										<div class="position-absolute start-0" th:classappend="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-success'}" 
 											th:style="'height: 3px; top: 35%; transform: translateY(-50%); z-index: 1; width: ' + 
-											(${returnRequestByOrderId.get(o.id).status == 'PENDING' ? '50%' : 
-											(returnRequestByOrderId.get(o.id).status == 'APPROVED' ? '75%' : 
-											(returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? '100%' : '100%'))})"></div>
+											(${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'PENDING' ? '50%' : 
+											(returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'APPROVED' ? '75%' : 
+											(returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? '100%' : '100%'))})"></div>
 
 										<!-- Step 1: Ordered -->
 										<div class="text-center" style="z-index: 2;">
@@ -83,24 +82,24 @@
 										<div class="text-center" style="z-index: 2;">
 											<span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px;"><i class="fa-solid fa-rotate-left text-white" style="font-size: 10px;"></i></span>
 											<div style="font-size: 0.65rem;" class="fw-bold text-warning">Return Req</div>
-											<div style="font-size: 0.55rem;" class="text-muted" th:if="${returnRequestByOrderId.get(o.id).requestDate != null}">[[${#dates.format(returnRequestByOrderId.get(o.id).requestDate, 'yyyy-MM-dd')}]]</div>
+											<div style="font-size: 0.55rem;" class="text-muted" th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).requestDate != null}">[[${#dates.format(returnRequestByOrderId.get(o.id).requestDate, 'yyyy-MM-dd')}]]</div>
 										</div>
 
 										<!-- Step 4: Approved / Rejected -->
 										<div class="text-center" style="z-index: 2;">
 											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
-												th:classappend="${returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? 'bg-success' : (returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-secondary')}" style="width: 24px; height: 24px;">
-												<i class="fa-solid fa-check text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED'}"></i>
-												<i class="fa-solid fa-xmark text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id).status == 'REJECTED'}"></i>
-												<i class="fa-solid fa-clock text-white" style="font-size: 9px;" th:if="${returnRequestByOrderId.get(o.id).status == 'PENDING'}"></i>
+												th:classappend="${returnRequestByOrderId.get(o.id) != null && (returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED') ? 'bg-success' : (returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'bg-danger' : 'bg-secondary')}" style="width: 24px; height: 24px;">
+												<i class="fa-solid fa-check text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id) != null && (returnRequestByOrderId.get(o.id).status == 'APPROVED' || returnRequestByOrderId.get(o.id).status == 'REFUNDED')}"></i>
+												<i class="fa-solid fa-xmark text-white" style="font-size: 10px;" th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REJECTED'}"></i>
+												<i class="fa-solid fa-clock text-white" style="font-size: 9px;" th:if="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'PENDING'}"></i>
 											</span>
-											<div style="font-size: 0.65rem;" class="fw-bold" th:text="${returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'Rejected' : 'Approved'}">Approved</div>
+											<div style="font-size: 0.65rem;" class="fw-bold" th:text="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REJECTED' ? 'Rejected' : 'Approved'}">Approved</div>
 										</div>
 
 										<!-- Step 5: Refunded -->
 										<div class="text-center" style="z-index: 2;">
 											<span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" 
-												th:classappend="${returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? 'bg-success' : 'bg-secondary'}" style="width: 24px; height: 24px;">
+												th:classappend="${returnRequestByOrderId.get(o.id) != null && returnRequestByOrderId.get(o.id).status == 'REFUNDED' ? 'bg-success' : 'bg-secondary'}" style="width: 24px; height: 24px;">
 												<i class="fa-solid fa-hand-holding-dollar text-white" style="font-size: 10px;"></i>
 											</span>
 											<div style="font-size: 0.65rem;" class="fw-bold">Refunded</div>
@@ -108,7 +107,7 @@
 									</div>
 
 									<!-- Standard Order Tracking Timeline -->
-									<div th:if="${!returnRequestByOrderId.containsKey(o.id) && o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
+									<div th:if="${(returnRequestByOrderId == null || !returnRequestByOrderId.containsKey(o.id)) && o.status != 'Cancelled'}" class="mt-2 d-flex justify-content-between align-items-center position-relative" style="margin: 0 auto;">
 										<!-- Line behind -->
 										<div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 40%; transform: translateY(-50%); z-index: 0;"></div>
 										<!-- Active Line -->
@@ -158,7 +157,7 @@
 											<div style="font-size: 0.6rem;" class="text-muted" th:if="${o.deliveredDate != null}">[[${o.deliveredDate}]]</div>
 										</div>
 									</div>
-									<div th:if="${!returnRequestByOrderId.containsKey(o.id) && o.status == 'Cancelled'}" class="text-center">
+									<div th:if="${(returnRequestByOrderId == null || !returnRequestByOrderId.containsKey(o.id)) && o.status == 'Cancelled'}" class="text-center">
 										<span class="badge bg-danger">Order Cancelled</span>
 									</div>
 								</td>
@@ -179,24 +178,24 @@
 								<i class="fa-solid fa-file-pdf text-danger me-1"></i> Invoice
 							</a>
 							<!-- Return Submitted Indicator or Return Button -->
-							<th:block th:if="${returnRequestByOrderId.containsKey(o.id)}">
+							<th:block th:if="${returnRequestByOrderId != null && returnRequestByOrderId.containsKey(o.id)}">
 								<th:block th:with="retReq=${returnRequestByOrderId.get(o.id)}">
-									<button th:if="${retReq.status == 'PENDING'}" class="btn btn-sm btn-outline-warning mb-1" disabled>
+									<button th:if="${retReq != null && retReq.status == 'PENDING'}" class="btn btn-sm btn-outline-warning mb-1" disabled>
 										<i class="fa-solid fa-clock me-1"></i> Return Pending
 									</button>
-									<button th:if="${retReq.status == 'APPROVED'}" class="btn btn-sm btn-outline-info mb-1" disabled>
+									<button th:if="${retReq != null && retReq.status == 'APPROVED'}" class="btn btn-sm btn-outline-info mb-1" disabled>
 										<i class="fa-solid fa-truck-ramp-box me-1"></i> Return Approved
 									</button>
-									<span th:if="${retReq.status == 'REFUNDED'}" class="badge bg-success mb-1 p-2">
+									<span th:if="${retReq != null && retReq.status == 'REFUNDED'}" class="badge bg-success mb-1 p-2">
 										<i class="fa-solid fa-hand-holding-dollar me-1"></i> Returned &amp; Refunded
 									</span>
-									<span th:if="${retReq.status == 'REJECTED'}" class="badge bg-danger mb-1 p-2">
+									<span th:if="${retReq != null && retReq.status == 'REJECTED'}" class="badge bg-danger mb-1 p-2">
 										<i class="fa-solid fa-xmark me-1"></i> Return Rejected
 									</span>
 								</th:block>
 							</th:block>
 							<!-- Return Request (only for Delivered and not yet returned) -->
-							<th:block th:if="${o.status == 'Delivered' && !returnRequestByOrderId.containsKey(o.id)}">
+							<th:block th:if="${o.status == 'Delivered' && (returnRequestByOrderId == null || !returnRequestByOrderId.containsKey(o.id))}">
 								<button class="btn btn-sm btn-outline-warning mb-1"
 									data-bs-toggle="modal" th:data-bs-target="${'#returnModal-' + o.id}">
 									<i class="fa-solid fa-rotate-left"></i> Return
@@ -228,6 +227,12 @@
 							</tr>
 						</tbody>
 					</table>
+
+					<div class="card shadow-sm p-4 text-center" th:if="${orders == null || orders.size() == 0}">
+						<p class="text-muted fs-5 mb-3">No orders found yet!</p>
+						<a href="/products" class="btn btn-primary">Start Shopping</a>
+					</div>
+
 				</div>
 			</div>
 
