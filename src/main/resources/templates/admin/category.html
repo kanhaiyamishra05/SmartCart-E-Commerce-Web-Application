@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>Category Details</title>
 </head>
 <body>
 	<section>
@@ -28,7 +28,7 @@
 							<form action="/admin/saveCategory" method="post"
 								enctype="multipart/form-data">
 								<div class="mb-3">
-									<label>Enter Category</label> <input type="text" name="name"
+									<label>Enter Category</label> <input type="text" name="name" required
 										class="form-control">
 								</div>
 
@@ -64,7 +64,7 @@
 					<div class="card card-sh">
 						<div class="card-header text-center fs-4">Category Details</div>
 						<div class="card-body">
-							<table class="table">
+							<table class="table align-middle">
 								<thead>
 									<tr>
 										<th scope="col">Sl No</th>
@@ -77,25 +77,24 @@
 								<tbody>
 									<tr th:each="cat,c:${categorys}">
 										<th scope="row">[[${c.count}]]</th>
-										<td>[[${cat.name}]]</td>
-										<td>[[${cat.isActive}]]</td>
+										<td>[[${cat.name != null ? cat.name : 'Category'}]]</td>
+										<td><span class="badge" th:classappend="${cat.isActive ? 'bg-success' : 'bg-danger'}">[[${cat.isActive ? 'Active' : 'Inactive'}]]</span></td>
 										<td><img
-											th:src="@{'/img/category_img/'+${cat.imageName}}"
-											width="50px" height="50px"></td>
+											th:src="@{'/img/category_img/'+${cat.imageName != null ? cat.imageName : 'default.jpg'}}"
+											width="50px" height="50px" style="object-fit: contain;"></td>
 										<td><a th:href="@{'/admin/loadEditCategory/'+${cat.id}}"
 											class="btn btn-primary btn-sm"><i
 												class="fa-solid fa-pen-to-square  fa-1x"></i> Edit </a> <a
 											th:href="@{'/admin/deleteCategory/'+${cat.id}}"
 											class="btn btn-danger btn-sm"><i
-												class="fa-solid fa-trash  fa-1x"></i>Delete</a></td>
+												class="fa-solid fa-trash  fa-1x"></i> Delete</a></td>
 									</tr>
-
 								</tbody>
 							</table>
 
-							<div class="row">
+							<div class="row" th:if="${totalPages != null && totalPages > 0}">
 								<div class="col-md-4">Total Category :
-									[[${totalElements}]]</div>
+									[[${totalElements != null ? totalElements : 0}]]</div>
 								<div class="col-md-6">
 
 									<nav aria-label="Page navigation example">
@@ -103,20 +102,20 @@
 											<li class="page-item"
 												th:classappend="${isFirst} ? 'disabled':''"><a
 												class="page-link"
-												th:href="@{'/admin/category?pageNo='+${pageNo-1}}"
+												th:href="@{'/admin/category?pageNo='+${pageNo != null ? pageNo-1 : 0}}"
 												aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 											</a></li>
 
-											<li th:each="i:${#numbers.sequence(1,totalPages)}"
+											<li th:each="i:${#numbers.sequence(1, totalPages > 0 ? totalPages : 1)}"
 												class="page-item"
-												th:classappend="${pageNo+1==i}?'active':''" ]]><a
+												th:classappend="${(pageNo != null ? pageNo+1 : 1)==i}?'active':''"><a
 												class="page-link"
 												th:href="@{'/admin/category?pageNo='+${i-1}}">[[${i}]]</a></li>
 
 											<li class="page-item"
 												th:classappend="${isLast} ? 'disabled':''"><a
 												class="page-link"
-												th:href="@{'/admin/category?pageNo='+${pageNo+1}}"
+												th:href="@{'/admin/category?pageNo='+${pageNo != null ? pageNo+1 : 0}}"
 												aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 											</a></li>
 										</ul>

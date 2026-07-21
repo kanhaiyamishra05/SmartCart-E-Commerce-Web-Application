@@ -21,17 +21,17 @@
         <tbody>
           <tr th:each="p, i : ${lowStockProducts}">
             <td>[[${i.count}]]</td>
-            <td><img th:src="@{'/img/product_img/' + ${p.image}}" width="50" height="50" style="object-fit:cover; border-radius:6px;"></td>
-            <td class="fw-semibold">[[${p.title}]]</td>
-            <td>[[${p.category}]]</td>
+            <td><img th:src="@{'/img/product_img/' + ${p.image != null ? p.image : 'default.jpg'}}" width="50" height="50" style="object-fit:contain; border-radius:6px;"></td>
+            <td class="fw-semibold">[[${p.title != null ? p.title : 'Product'}]]</td>
+            <td>[[${p.category != null ? p.category : 'N/A'}]]</td>
             <td>
-              <span th:if="${p.stock == 0}" class="badge bg-danger fs-6">OUT OF STOCK (0)</span>
-              <span th:if="${p.stock > 0 && p.stock <= 2}" class="badge bg-warning text-dark fs-6">CRITICAL ([[${p.stock}]] left)</span>
-              <span th:if="${p.stock > 2 && p.stock <= 5}" class="badge bg-info text-dark fs-6">LOW ([[${p.stock}]] left)</span>
+              <span th:if="${p.stock == null || p.stock == 0}" class="badge bg-danger fs-6">OUT OF STOCK (0)</span>
+              <span th:if="${p.stock != null && p.stock > 0 && p.stock <= 2}" class="badge bg-warning text-dark fs-6">CRITICAL ([[${p.stock}]] left)</span>
+              <span th:if="${p.stock != null && p.stock > 2 && p.stock <= 5}" class="badge bg-info text-dark fs-6">LOW ([[${p.stock}]] left)</span>
             </td>
             <td>
-              <span th:if="${p.isActive}" class="badge bg-success">Active</span>
-              <span th:unless="${p.isActive}" class="badge bg-secondary">Inactive</span>
+              <span th:if="${p.isActive != null && p.isActive}" class="badge bg-success">Active</span>
+              <span th:unless="${p.isActive != null && p.isActive}" class="badge bg-secondary">Inactive</span>
             </td>
             <td>
               <a th:href="@{'/admin/editProduct/' + ${p.id}}" class="btn btn-sm btn-outline-primary">

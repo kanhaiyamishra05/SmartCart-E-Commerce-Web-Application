@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>All Products</title>
 </head>
 <body>
 	<section>
@@ -23,29 +23,21 @@
 					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
 				</th:block>
 
-				<th:block th:if="${session.errorMsg}">
-					<p class="text-danger fw-bold text-center">[[${session.errorMsg}]]</p>
-					<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
-				</th:block>
 				<div class="col-md-4 p-3">
-
 					<form action="/admin/products" method="get">
 						<div class="row">
 							<div class="col">
-								<input type="text" class="form-control " name="ch">
+								<input type="text" class="form-control " name="ch" placeholder="Search product...">
 							</div>
 							<div class="col">
 								<button class="btn btn-primary col">Search</button>
 							</div>
 						</div>
 					</form>
-
 				</div>
 
-
-				<!-- <div class="card card-sh">-->
 				<div class="p-3">
-					<table class="table table-bordered">
+					<table class="table table-bordered align-middle">
 						<thead class="table-light ">
 							<tr>
 								<th scope="col">Sl No</th>
@@ -63,59 +55,54 @@
 						<tbody>
 							<tr th:each="p,c:${products}">
 								<th scope="row">[[${c.count}]]</th>
-								<td><img th:src="@{'/img/product_img/'+${p.image}}"
-									width="70px" height="70px"></td>
-								<td>[[${p.title}]]</td>
-								<td>[[${p.category}]]</td>
-								<td>[[${p.price}]]</td>
-								<td>[[${p.discount}]]</td>
-								<td>[[${#numbers.formatDecimal(p.discountPrice, 1, 2)}]]</td>
-								<td>[[${p.isActive}]]</td>
-								<td>[[${p.stock}]]</td>
+								<td><img th:src="@{'/img/product_img/'+${p.image != null ? p.image : 'default.jpg'}}"
+									width="70px" height="70px" style="object-fit: contain;"></td>
+								<td>[[${p.title != null ? p.title : 'Product'}]]</td>
+								<td>[[${p.category != null ? p.category : 'N/A'}]]</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${p.price != null ? p.price : 0}]]</td>
+								<td>[[${p.discount != null ? p.discount : 0}]]%</td>
+								<td><th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(p.discountPrice != null ? p.discountPrice : (p.price != null ? p.price : 0), 1, 2)}]]</td>
+								<td><span class="badge" th:classappend="${p.isActive ? 'bg-success' : 'bg-danger'}">[[${p.isActive ? 'Active' : 'Inactive'}]]</span></td>
+								<td>[[${p.stock != null ? p.stock : 0}]]</td>
 								<td><a th:href="@{'/admin/editProduct/'+${p.id}}"
 									class="btn btn-sm btn-primary"><i
-										class="fa-solid fa-pen-to-square"></i>Edit</a> <a
+										class="fa-solid fa-pen-to-square"></i> Edit</a> <a
 									th:href="@{'/admin/deleteProduct/'+${p.id}}"
 									class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i>
 										Delete</a></td>
 							</tr>
-
 						</tbody>
 					</table>
 
-					<div class="row">
-						<div class="col-md-4">Total Product : [[${totalElements}]]</div>
+					<div class="row" th:if="${totalPages != null && totalPages > 0}">
+						<div class="col-md-4">Total Product : [[${totalElements != null ? totalElements : 0}]]</div>
 						<div class="col-md-6">
-
 							<nav aria-label="Page navigation example">
 								<ul class="pagination">
 									<li class="page-item"
 										th:classappend="${isFirst} ? 'disabled':''"><a
 										class="page-link"
-										th:href="@{'/admin/products?pageNo='+${pageNo-1}}"
+										th:href="@{'/admin/products?pageNo='+${pageNo != null ? pageNo-1 : 0}}"
 										aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 									</a></li>
 
-									<li th:each="i:${#numbers.sequence(1,totalPages)}"
-										class="page-item" th:classappend="${pageNo+1==i}?'active':''"
-										]]><a class="page-link"
+									<li th:each="i:${#numbers.sequence(1, totalPages > 0 ? totalPages : 1)}"
+										class="page-item" th:classappend="${(pageNo != null ? pageNo+1 : 1)==i}?'active':''"><a class="page-link"
 										th:href="@{'/admin/products?pageNo='+${i-1}}">[[${i}]]</a></li>
 
 									<li class="page-item"
 										th:classappend="${isLast} ? 'disabled':''"><a
 										class="page-link"
-										th:href="@{'/admin/products?pageNo='+${pageNo+1}}"
+										th:href="@{'/admin/products?pageNo='+${pageNo != null ? pageNo+1 : 0}}"
 										aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 									</a></li>
 								</ul>
 							</nav>
 						</div>
-
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- 	</div> -->
 	</section>
 </body>
 </html>

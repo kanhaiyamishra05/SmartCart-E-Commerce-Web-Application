@@ -18,14 +18,17 @@
           </tr>
           <tr th:each="rv, i : ${reviews}">
             <td>[[${i.count}]]</td>
-            <td class="fw-semibold small">[[${rv.product.title}]]</td>
-            <td class="small">[[${rv.user.name}]]</td>
+            <td class="fw-semibold small">[[${rv.product != null ? rv.product.title : 'Product'}]]</td>
+            <td class="small">[[${rv.user != null ? rv.user.name : 'User'}]]</td>
             <td>
-              <span th:each="s : ${#numbers.sequence(1, rv.rating)}" class="text-warning">★</span>
-              <span th:each="s : ${#numbers.sequence(rv.rating + 1, 5)}" class="text-muted">★</span>
+              <span th:if="${rv.rating != null && rv.rating > 0}">
+                <span th:each="s : ${#numbers.sequence(1, rv.rating)}" class="text-warning">★</span>
+                <span th:if="${rv.rating < 5}" th:each="s : ${#numbers.sequence(rv.rating + 1, 5)}" class="text-muted">★</span>
+              </span>
+              <span th:if="${rv.rating == null || rv.rating == 0}" class="text-muted">No Rating</span>
             </td>
-            <td class="small" style="max-width:200px;">[[${rv.comment}]]</td>
-            <td class="small">[[${#dates.format(rv.reviewDate, 'dd MMM yyyy')}]]</td>
+            <td class="small" style="max-width:200px;">[[${rv.comment != null ? rv.comment : ''}]]</td>
+            <td class="small">[[${rv.reviewDate != null ? #dates.format(rv.reviewDate, 'dd MMM yyyy') : '-'}]]</td>
             <td>
               <span th:if="${rv.isApproved != null && rv.isApproved}" class="badge bg-success">Approved</span>
               <span th:if="${rv.isApproved == null || !rv.isApproved}" class="badge bg-danger">Hidden</span>
@@ -42,4 +45,3 @@
   </div>
 </div>
 </section></body></html>
-

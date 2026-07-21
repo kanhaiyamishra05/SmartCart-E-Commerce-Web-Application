@@ -3,7 +3,7 @@
 	th:replace="~{base::layout(~{::section})}">
 <head>
 <meta charset="ISO-8859-1">
-<title>Insert title here</title>
+<title>User Accounts</title>
 </head>
 <body>
 	<section>
@@ -24,7 +24,7 @@
 					</th:block>
 				</div>
 				<div class="card-body">
-					<table class="table">
+					<table class="table align-middle" th:if="${users != null && users.size() > 0}">
 						<thead>
 							<tr>
 								<th scope="col">Sl No</th>
@@ -40,13 +40,13 @@
 						<tbody>
 							<tr th:each="u,c:${users}">
 								<th scope="row">[[${c.count}]]</th>
-								<td><img th:src="@{'/img/profile_img/'+${u.profileImage}}"
-									width="70px" height="70px"></td>
-								<td>[[${u.name}]]</td>
-								<td>[[${u.email}]]</td>
-								<td>[[${u.mobileNumber}]]</td>
-								<td>[[${u.address+','+u.city+','+u.state+','+u.pincode}]]</td>
-								<td>[[${u.isEnable}]]</td>
+								<td><img th:src="@{'/img/profile_img/'+${u.profileImage != null ? u.profileImage : 'default.jpg'}}"
+									width="50px" height="50px" class="rounded-circle" style="object-fit: cover;"></td>
+								<td>[[${u.name != null ? u.name : 'User'}]]</td>
+								<td>[[${u.email != null ? u.email : 'N/A'}]]</td>
+								<td>[[${u.mobileNumber != null ? u.mobileNumber : 'N/A'}]]</td>
+								<td>[[${(u.address != null ? u.address : '') + (u.city != null ? ', ' + u.city : '') + (u.state != null ? ', ' + u.state : '') + (u.pincode != null ? ' - ' + u.pincode : '')}]]</td>
+								<td><span class="badge" th:classappend="${u.isEnable ? 'bg-success' : 'bg-danger'}">[[${u.isEnable ? 'Active' : 'Inactive'}]]</span></td>
 								<td><a th:href="@{'/admin/updateSts?status=true&id='+${u.id}}+'&type='+${userType}"
 									class="btn btn-sm btn-primary">Active</a> 
 										
@@ -55,9 +55,11 @@
 									class="btn btn-sm btn-danger">
 										Inactive</a></td>
 							</tr>
-
 						</tbody>
 					</table>
+					<div class="text-center p-4" th:if="${users == null || users.size() == 0}">
+						<p class="text-muted fs-5 mb-0">No users found!</p>
+					</div>
 				</div>
 			</div>
 		</div>

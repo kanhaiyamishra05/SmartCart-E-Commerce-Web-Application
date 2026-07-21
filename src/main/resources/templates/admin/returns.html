@@ -8,7 +8,7 @@
 
   <div class="card shadow-sm border-0">
     <div class="card-body p-0">
-      <table class="table table-hover mb-0">
+      <table class="table table-hover mb-0 align-middle">
         <thead class="table-dark">
           <tr><th>#</th><th>User</th><th>Order ID</th><th>Reason</th><th>Date</th><th>Status</th><th>Admin Note</th><th>Action</th></tr>
         </thead>
@@ -18,14 +18,14 @@
           </tr>
           <tr th:each="rr, i : ${returnRequests}">
             <td>[[${i.count}]]</td>
-            <td>[[${rr.user.name}]]</td>
-            <td>#[[${rr.order.id}]]</td>
-            <td>[[${rr.reason}]]</td>
-            <td>[[${#dates.format(rr.requestDate, 'dd MMM yyyy')}]]</td>
+            <td>[[${rr.user != null ? rr.user.name : 'User'}]]</td>
+            <td>#[[${rr.order != null ? (rr.order.orderId != null ? rr.order.orderId : rr.order.id) : 'N/A'}]]</td>
+            <td>[[${rr.reason != null ? rr.reason : 'N/A'}]]</td>
+            <td>[[${rr.requestDate != null ? #dates.format(rr.requestDate, 'dd MMM yyyy') : '-'}]]</td>
             <td>
               <span class="badge"
                 th:classappend="${rr.status == 'REFUNDED' ? 'bg-success' : (rr.status == 'APPROVED' ? 'bg-primary' : (rr.status == 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark'))}"
-                th:text="${rr.status}"></span>
+                th:text="${rr.status != null ? rr.status : 'PENDING'}"></span>
             </td>
             <td><small th:text="${rr.adminNote != null ? rr.adminNote : '-'}"></small></td>
             <td>
