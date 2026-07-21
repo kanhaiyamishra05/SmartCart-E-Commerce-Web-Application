@@ -4,6 +4,15 @@
 
 ---
 
+## 🌐 Live Production Deployment Links
+
+- 🛍️ **Live Customer Web Store**: [https://smartcart-app-xi8s.onrender.com/](https://smartcart-app-xi8s.onrender.com/)
+- 📊 **Live Executive Admin Portal**: [https://smartcart-app-xi8s.onrender.com/admin/](https://smartcart-app-xi8s.onrender.com/admin/)
+- 📖 **Interactive Swagger API Docs**: [https://smartcart-app-xi8s.onrender.com/swagger-ui.html](https://smartcart-app-xi8s.onrender.com/swagger-ui.html)
+- 🌐 **Centralized Store REST API Payload**: [https://smartcart-app-xi8s.onrender.com/api/v1/store-overview](https://smartcart-app-xi8s.onrender.com/api/v1/store-overview)
+
+---
+
 ## 🌟 Key Features
 
 ### 🛍️ Shopper Experience
@@ -39,9 +48,10 @@
 
 - **Backend**: Java 17, Spring Boot 3.2.3, Spring Data JPA, Spring Security
 - **Frontend**: HTML5, Thymeleaf, JavaScript (ES6+), Bootstrap 5, FontAwesome 6, Chart.js
-- **Database**: MySQL Server
+- **Database**: MySQL Server (Managed Cloud Aiven MySQL)
 - **Document & PDF**: OpenPDF (Lowagie PDF)
 - **Payments**: Razorpay Java SDK & Cash on Delivery (COD)
+- **Deployment**: Docker & Render Cloud
 - **Build Tool**: Maven
 
 ---
@@ -61,11 +71,11 @@ SmartCart includes a **Centralized API Suite (`/api/v1`)** to retrieve all store
 ```json
 {
   "status": "SUCCESS",
-  "totalCategories": 6,
-  "totalActiveProducts": 24,
-  "activeCouponsCount": 3,
-  "activeFlashSalesCount": 2,
-  "timestamp": "2026-07-21T13:47:00.000+00:00"
+  "totalCategories": 5,
+  "totalActiveProducts": 18,
+  "activeCouponsCount": 0,
+  "activeFlashSalesCount": 0,
+  "timestamp": "2026-07-21T12:22:57.552+00:00"
 }
 ```
 
@@ -101,6 +111,6 @@ SmartCart includes a **Centralized API Suite (`/api/v1`)** to retrieve all store
    ```
 
 5. **Access Application**:
-   - Web App: `http://localhost:8080`
-   - Admin Panel: `http://localhost:8080/admin/`
-   - Centralized API: `http://localhost:8080/api/v1/store-overview`
+   - Live Demo Web App: `https://smartcart-app-xi8s.onrender.com/`
+   - Live Admin Panel: `https://smartcart-app-xi8s.onrender.com/admin/`
+   - Live Swagger Docs: `https://smartcart-app-xi8s.onrender.com/swagger-ui.html`
