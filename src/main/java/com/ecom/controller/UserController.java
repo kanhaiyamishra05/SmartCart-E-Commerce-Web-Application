@@ -72,6 +72,9 @@ public class UserController {
 	@Autowired
 	private CouponService couponService;
 
+	@Autowired
+	private com.ecom.repository.CouponRepository couponRepository;
+
 	@org.springframework.beans.factory.annotation.Value("${razorpay.key.id}")
 	private String razorpayKeyId;
 
@@ -204,6 +207,14 @@ public class UserController {
 		if (loyaltyPointsToRedeem != null) promoSummary.append("Points:").append(loyaltyPointsToRedeem);
 
 		orderService.saveOrder(user.getId(), request, promoSummary.toString().trim(), totalDiscount);
+
+		if (couponCode != null) {
+			Coupon coupon = couponService.getCouponByCode(couponCode);
+			if (coupon != null) {
+				coupon.setUsageCount((coupon.getUsageCount() == null ? 0 : coupon.getUsageCount()) + 1);
+				couponRepository.save(coupon);
+			}
+		}
 
 		if (giftCardCode != null) {
 			com.ecom.model.GiftCard gc = giftCardRepository.findByCodeAndIsUsedFalse(giftCardCode);
@@ -363,13 +374,28 @@ public class UserController {
 
 	@PostMapping("/apply-coupon")
 	public String applyCoupon(@RequestParam String code, @RequestParam Double orderAmount, Principal p, HttpSession session) {
-		Boolean isValid = couponService.validateCoupon(code, orderAmount);
+		UserDtls user = getLoggedInUserDetails(p);
+		String cleanCode = code.trim().toUpperCase();
+
+		// Check if this user has already used this coupon code on a previous order
+		List<ProductOrder> userOrders = productOrderRepository.findByUserId(user.getId());
+		boolean alreadyUsed = userOrders.stream()
+				.anyMatch(o -> o.getCouponCode() != null && o.getCouponCode().toUpperCase().contains(cleanCode));
+
+		if (alreadyUsed) {
+			session.setAttribute("errorMsg", "You have already used coupon code '" + cleanCode + "' on a previous order!");
+			session.removeAttribute("couponCode");
+			session.removeAttribute("discount");
+			return "redirect:/user/orders";
+		}
+
+		Boolean isValid = couponService.validateCoupon(cleanCode, orderAmount);
 		if (isValid) {
-			Coupon coupon = couponService.getCouponByCode(code);
+			Coupon coupon = couponService.getCouponByCode(cleanCode);
 			Double discount = orderAmount * (coupon.getDiscountPercentage() / 100.0);
-			session.setAttribute("couponCode", code);
+			session.setAttribute("couponCode", cleanCode);
 			session.setAttribute("discount", discount);
-			session.setAttribute("succMsg", "Coupon applied! Discount of " + coupon.getDiscountPercentage() + "% applied.");
+			session.setAttribute("succMsg", "Coupon '" + cleanCode + "' applied! Discount of " + coupon.getDiscountPercentage() + "% applied.");
 		} else {
 			session.setAttribute("errorMsg", "Invalid or expired Coupon Code!");
 			session.removeAttribute("couponCode");
