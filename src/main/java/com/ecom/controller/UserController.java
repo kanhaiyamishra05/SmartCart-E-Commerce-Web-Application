@@ -130,13 +130,17 @@ public class UserController {
 
 	@GetMapping("/cart")
 	public String loadCartPage(Principal p, Model m) {
-
 		UserDtls user = getLoggedInUserDetails(p);
+		if (user == null) return "redirect:/signin";
+
 		List<Cart> carts = cartService.getCartsByUser(user.getId());
+		if (carts == null) carts = new java.util.ArrayList<>();
 		m.addAttribute("carts", carts);
-		if (carts.size() > 0) {
+		if (carts.size() > 0 && carts.get(carts.size() - 1) != null) {
 			Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
-			m.addAttribute("totalOrderPrice", totalOrderPrice);
+			m.addAttribute("totalOrderPrice", totalOrderPrice != null ? totalOrderPrice : 0.0);
+		} else {
+			m.addAttribute("totalOrderPrice", 0.0);
 		}
 		return "/user/cart";
 	}
@@ -148,9 +152,9 @@ public class UserController {
 	}
 
 	private UserDtls getLoggedInUserDetails(Principal p) {
+		if (p == null) return null;
 		String email = p.getName();
-		UserDtls userDtls = userService.getUserByEmail(email);
-		return userDtls;
+		return userService.getUserByEmail(email);
 	}
 
 	@Autowired
@@ -159,31 +163,39 @@ public class UserController {
 	@GetMapping("/orders")
 	public String orderPage(Principal p, Model m, HttpSession session) {
 		UserDtls user = getLoggedInUserDetails(p);
+		if (user == null) return "redirect:/signin";
+
 		List<Cart> carts = cartService.getCartsByUser(user.getId());
+		if (carts == null) carts = new java.util.ArrayList<>();
 		m.addAttribute("carts", carts);
-		if (carts.size() > 0) {
-			Double orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
-			Double totalOrderPrice = carts.get(carts.size() - 1).getTotalOrderPrice() + 250 + 100;
-			m.addAttribute("orderPrice", orderPrice);
+
+		Double orderPrice = 0.0;
+		Double totalOrderPrice = 0.0;
+		Double totalDiscount = 0.0;
+
+		if (carts.size() > 0 && carts.get(carts.size() - 1) != null && carts.get(carts.size() - 1).getTotalOrderPrice() != null) {
+			orderPrice = carts.get(carts.size() - 1).getTotalOrderPrice();
+			totalOrderPrice = orderPrice + 250 + 100;
 
 			Double couponDiscount = (Double) session.getAttribute("discount");
 			Double giftCardAmount = (Double) session.getAttribute("giftCardAmount");
 			Double loyaltyDiscount = (Double) session.getAttribute("loyaltyDiscount");
 
-			Double totalDiscount = 0.0;
 			if (couponDiscount != null) totalDiscount += couponDiscount;
 			if (giftCardAmount != null) totalDiscount += giftCardAmount;
 			if (loyaltyDiscount != null) totalDiscount += loyaltyDiscount;
-
-			m.addAttribute("totalDiscount", totalDiscount);
-			m.addAttribute("totalOrderPrice", totalOrderPrice);
-			m.addAttribute("finalPayable", Math.max(0.0, totalOrderPrice - totalDiscount));
 		}
+
+		m.addAttribute("orderPrice", orderPrice);
+		m.addAttribute("totalDiscount", totalDiscount);
+		m.addAttribute("totalOrderPrice", totalOrderPrice);
+		m.addAttribute("finalPayable", Math.max(0.0, totalOrderPrice - totalDiscount));
+
 		List<Coupon> activeCoupons = couponService.getActiveCoupons();
-		m.addAttribute("activeCoupons", activeCoupons);
+		m.addAttribute("activeCoupons", activeCoupons != null ? activeCoupons : new java.util.ArrayList<>());
 
 		java.util.List<com.ecom.model.GiftCard> giftCards = giftCardRepository.findByIsUsedFalse();
-		m.addAttribute("giftCards", giftCards);
+		m.addAttribute("giftCards", giftCards != null ? giftCards : new java.util.ArrayList<>());
 
 		return "/user/order";
 	}
@@ -191,6 +203,8 @@ public class UserController {
 	@PostMapping("/save-order")
 	public String saveOrder(@ModelAttribute OrderRequest request, Principal p, HttpSession session) throws Exception {
 		UserDtls user = getLoggedInUserDetails(p);
+		if (user == null) return "redirect:/signin";
+
 		String couponCode = (String) session.getAttribute("couponCode");
 		String giftCardCode = (String) session.getAttribute("giftCardCode");
 		Integer loyaltyPointsToRedeem = (Integer) session.getAttribute("loyaltyPointsToRedeem");
@@ -253,11 +267,24 @@ public class UserController {
 	@GetMapping("/user-orders")
 	public String myOrder(Model m, Principal p) {
 		UserDtls loginUser = getLoggedInUserDetails(p);
+		if (loginUser == null) return "redirect:/signin";
+
 		List<ProductOrder> orders = orderService.getOrdersByUser(loginUser.getId());
-		java.util.Map<Integer, com.ecom.model.ReturnRequest> returnRequestByOrderId = returnRequestRepository
-				.findByUserId(loginUser.getId()).stream()
-				.collect(java.util.stream.Collectors.toMap(request -> request.getOrder().getId(),
-						request -> request, (first, second) -> first));
+		if (orders == null) orders = new java.util.ArrayList<>();
+
+		java.util.Map<Integer, com.ecom.model.ReturnRequest> returnRequestByOrderId = new java.util.HashMap<>();
+		try {
+			List<com.ecom.model.ReturnRequest> reqs = returnRequestRepository.findByUserId(loginUser.getId());
+			if (reqs != null) {
+				for (com.ecom.model.ReturnRequest req : reqs) {
+					if (req != null && req.getOrder() != null && req.getOrder().getId() != null) {
+						returnRequestByOrderId.put(req.getOrder().getId(), req);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		m.addAttribute("orders", orders);
 		m.addAttribute("returnRequestByOrderId", returnRequestByOrderId);
 		return "/user/my_orders";
