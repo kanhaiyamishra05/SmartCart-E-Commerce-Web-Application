@@ -482,6 +482,11 @@
 		localStorage.removeItem('compareList');
 		updateCompareBar();
 	}
+	function formatINR(val) {
+		const num = Number(val) || 0;
+		return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+	}
+
 	function openCompareModal() {
 		if (compareList.length === 0) return;
 		const header = document.getElementById('compareHeader');
@@ -489,8 +494,8 @@
 		header.innerHTML = '<th>Product Feature</th>' + compareList.map(p => `<th style="width:${90/compareList.length}%;"><img src="/img/product_img/${p.image}" height="100" style="object-fit:contain;" class="d-block mx-auto mb-2"><div class="fw-bold">${p.title}</div></th>`).join('');
 		body.innerHTML = `
 			<tr><td class="fw-bold bg-light">Category</td>${compareList.map(p => `<td><span class="badge bg-secondary">${p.category}</span></td>`).join('')}</tr>
-			<tr><td class="fw-bold bg-light">Offer Price</td>${compareList.map(p => `<td class="fw-bold text-success fs-5">₹${p.discountPrice}</td>`).join('')}</tr>
-			<tr><td class="fw-bold bg-light">Original Price</td>${compareList.map(p => `<td class="text-decoration-line-through text-muted">₹${p.price}</td>`).join('')}</tr>
+			<tr><td class="fw-bold bg-light">Offer Price</td>${compareList.map(p => `<td class="fw-bold text-success fs-5">₹${formatINR(p.discountPrice)}</td>`).join('')}</tr>
+			<tr><td class="fw-bold bg-light">Original Price</td>${compareList.map(p => `<td class="text-decoration-line-through text-muted">₹${formatINR(p.price)}</td>`).join('')}</tr>
 			<tr><td class="fw-bold bg-light">Discount</td>${compareList.map(p => `<td><span class="badge bg-danger">${p.discount}% OFF</span></td>`).join('')}</tr>
 			<tr><td class="fw-bold bg-light">Action</td>${compareList.map(p => `<td><a href="/product/${p.id}" class="btn btn-sm btn-primary fw-bold w-100">View Details</a></td>`).join('')}</tr>
 		`;
