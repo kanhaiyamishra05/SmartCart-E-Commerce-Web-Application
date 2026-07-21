@@ -60,23 +60,28 @@ public class ApiController {
 	@GetMapping("/store-overview")
 	public ResponseEntity<Map<String, Object>> getStoreOverview() {
 		Map<String, Object> data = new HashMap<>();
+		try {
+			List<Category> categories = categoryService.getAllActiveCategory();
+			List<Product> products = productService.getAllActiveProducts("");
+			List<Coupon> activeCoupons = couponService.getActiveCoupons();
+			List<FlashSale> activeFlashSales = flashSaleRepository.findByIsActiveTrueAndEndTimeAfter(new java.util.Date());
 
-		List<Category> categories = categoryService.getAllActiveCategory();
-		List<Product> products = productService.getAllActiveProducts("");
-		List<Coupon> activeCoupons = couponService.getActiveCoupons();
-		List<FlashSale> activeFlashSales = flashSaleRepository.findByIsActiveTrueAndEndTimeAfter(new java.util.Date());
+			data.put("status", "SUCCESS");
+			data.put("totalCategories", categories != null ? categories.size() : 0);
+			data.put("totalActiveProducts", products != null ? products.size() : 0);
+			data.put("categories", categories);
+			data.put("activeCouponsCount", activeCoupons != null ? activeCoupons.size() : 0);
+			data.put("activeCoupons", activeCoupons);
+			data.put("activeFlashSalesCount", activeFlashSales != null ? activeFlashSales.size() : 0);
+			data.put("activeFlashSales", activeFlashSales);
+			data.put("timestamp", new java.util.Date());
 
-		data.put("status", "SUCCESS");
-		data.put("totalCategories", categories.size());
-		data.put("totalActiveProducts", products.size());
-		data.put("categories", categories);
-		data.put("activeCouponsCount", activeCoupons.size());
-		data.put("activeCoupons", activeCoupons);
-		data.put("activeFlashSalesCount", activeFlashSales.size());
-		data.put("activeFlashSales", activeFlashSales);
-		data.put("timestamp", new java.util.Date());
-
-		return ResponseEntity.ok(data);
+			return ResponseEntity.ok(data);
+		} catch (Exception e) {
+			data.put("status", "ERROR");
+			data.put("message", e.getMessage());
+			return ResponseEntity.ok(data);
+		}
 	}
 
 	/**
@@ -88,12 +93,19 @@ public class ApiController {
 			@RequestParam(defaultValue = "") String ch,
 			@RequestParam(defaultValue = "") String category) {
 		Map<String, Object> response = new HashMap<>();
-		List<Product> products = productService.getAllActiveProducts(category);
-		response.put("query", ch);
-		response.put("category", category);
-		response.put("count", products.size());
-		response.put("products", products);
-		return ResponseEntity.ok(response);
+		try {
+			List<Product> products = productService.getAllActiveProducts(category);
+			response.put("status", "SUCCESS");
+			response.put("query", ch);
+			response.put("category", category);
+			response.put("count", products != null ? products.size() : 0);
+			response.put("products", products);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			response.put("status", "ERROR");
+			response.put("message", e.getMessage());
+			return ResponseEntity.ok(response);
+		}
 	}
 
 	/**
@@ -103,21 +115,28 @@ public class ApiController {
 	@GetMapping("/analytics")
 	public ResponseEntity<Map<String, Object>> getAnalytics() {
 		Map<String, Object> analytics = new HashMap<>();
-		List<ProductOrder> allOrders = productOrderRepository.findAll();
-		double totalRevenue = allOrders.stream()
-				.filter(o -> !"Cancelled".equalsIgnoreCase(o.getStatus()))
-				.mapToDouble(o -> o.getPrice() * o.getQuantity())
-				.sum();
+		try {
+			List<ProductOrder> allOrders = productOrderRepository.findAll();
+			double totalRevenue = (allOrders != null) ? allOrders.stream()
+					.filter(o -> o != null && !"Cancelled".equalsIgnoreCase(o.getStatus()))
+					.mapToDouble(o -> (o.getPrice() != null ? o.getPrice() : 0.0) * (o.getQuantity() != null ? o.getQuantity() : 1))
+					.sum() : 0.0;
 
-		analytics.put("totalOrders", allOrders.size());
-		analytics.put("totalRevenueINR", totalRevenue);
-		analytics.put("totalProducts", productService.getAllProducts().size());
-		analytics.put("registeredUsers", userService.getUsers("ROLE_USER").size());
-		analytics.put("pendingOrders", allOrders.stream().filter(o -> "In Progress".equalsIgnoreCase(o.getStatus())).count());
-		analytics.put("deliveredOrders", allOrders.stream().filter(o -> "Delivered".equalsIgnoreCase(o.getStatus())).count());
-		analytics.put("cancelledOrders", allOrders.stream().filter(o -> "Cancelled".equalsIgnoreCase(o.getStatus())).count());
-		analytics.put("generatedAt", new java.util.Date());
+			analytics.put("status", "SUCCESS");
+			analytics.put("totalOrders", allOrders != null ? allOrders.size() : 0);
+			analytics.put("totalRevenueINR", totalRevenue);
+			analytics.put("totalProducts", productService.getAllProducts() != null ? productService.getAllProducts().size() : 0);
+			analytics.put("registeredUsers", userService.getUsers("ROLE_USER") != null ? userService.getUsers("ROLE_USER").size() : 0);
+			analytics.put("pendingOrders", allOrders != null ? allOrders.stream().filter(o -> o != null && "In Progress".equalsIgnoreCase(o.getStatus())).count() : 0);
+			analytics.put("deliveredOrders", allOrders != null ? allOrders.stream().filter(o -> o != null && "Delivered".equalsIgnoreCase(o.getStatus())).count() : 0);
+			analytics.put("cancelledOrders", allOrders != null ? allOrders.stream().filter(o -> o != null && "Cancelled".equalsIgnoreCase(o.getStatus())).count() : 0);
+			analytics.put("generatedAt", new java.util.Date());
 
-		return ResponseEntity.ok(analytics);
+			return ResponseEntity.ok(analytics);
+		} catch (Exception e) {
+			analytics.put("status", "ERROR");
+			analytics.put("message", e.getMessage());
+			return ResponseEntity.ok(analytics);
+		}
 	}
 }
