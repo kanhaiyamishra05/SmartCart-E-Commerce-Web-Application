@@ -97,13 +97,19 @@ public class AdminController {
 		if (p != null) {
 			String email = p.getName();
 			UserDtls userDtls = userService.getUserByEmail(email);
-			m.addAttribute("user", userDtls);
-			Integer countCart = cartService.getCountCart(userDtls.getId());
-			m.addAttribute("countCart", countCart);
+			if (userDtls != null) {
+				m.addAttribute("user", userDtls);
+				Integer countCart = cartService.getCountCart(userDtls.getId());
+				m.addAttribute("countCart", countCart != null ? countCart : 0);
+			} else {
+				m.addAttribute("countCart", 0);
+			}
+		} else {
+			m.addAttribute("countCart", 0);
 		}
 
 		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
-		m.addAttribute("categorys", allActiveCategory);
+		m.addAttribute("categorys", allActiveCategory != null ? allActiveCategory : java.util.Collections.emptyList());
 	}
 
 	@GetMapping("/")
