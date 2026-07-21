@@ -109,15 +109,17 @@ public class AdminController {
 	@GetMapping("/")
 	public String index(Model m) {
 		List<ProductOrder> allOrders = productOrderRepository.findAll();
+		if (allOrders == null) allOrders = new java.util.ArrayList<>();
+
 		double totalRevenue = allOrders.stream()
-				.filter(o -> !"Cancelled".equalsIgnoreCase(o.getStatus()))
-				.mapToDouble(o -> o.getPrice() * o.getQuantity())
+				.filter(o -> o != null && !"Cancelled".equalsIgnoreCase(o.getStatus()))
+				.mapToDouble(o -> (o.getPrice() != null ? o.getPrice() : 0.0) * (o.getQuantity() != null ? o.getQuantity() : 1))
 				.sum();
-		long totalProducts = productService.getAllProducts().size();
-		long totalUsers = userService.getUsers("ROLE_USER").size();
-		long pendingOrders = allOrders.stream().filter(o -> "In Progress".equalsIgnoreCase(o.getStatus())).count();
-		long deliveredOrders = allOrders.stream().filter(o -> "Delivered".equalsIgnoreCase(o.getStatus())).count();
-		long cancelledOrders = allOrders.stream().filter(o -> "Cancelled".equalsIgnoreCase(o.getStatus())).count();
+		long totalProducts = productService.getAllProducts() != null ? productService.getAllProducts().size() : 0;
+		long totalUsers = userService.getUsers("ROLE_USER") != null ? userService.getUsers("ROLE_USER").size() : 0;
+		long pendingOrders = allOrders.stream().filter(o -> o != null && "In Progress".equalsIgnoreCase(o.getStatus())).count();
+		long deliveredOrders = allOrders.stream().filter(o -> o != null && "Delivered".equalsIgnoreCase(o.getStatus())).count();
+		long cancelledOrders = allOrders.stream().filter(o -> o != null && "Cancelled".equalsIgnoreCase(o.getStatus())).count();
 
 		m.addAttribute("totalRevenue", totalRevenue);
 		m.addAttribute("totalOrders", allOrders.size());
@@ -503,13 +505,17 @@ public class AdminController {
 	@GetMapping("/sales-report")
 	public String salesReport(Model m) {
 		List<ProductOrder> orders = orderService.getAllOrders();
+		if (orders == null) orders = new java.util.ArrayList<>();
+
 		double totalRevenue = 0.0;
 		long totalOrders = orders.size();
-		long totalUsers = userService.getUsers("ROLE_USER").size();
+		long totalUsers = userService.getUsers("ROLE_USER") != null ? userService.getUsers("ROLE_USER").size() : 0;
 
 		for (ProductOrder o : orders) {
-			if (!"Cancelled".equalsIgnoreCase(o.getStatus())) {
-				double orderTotal = o.getPrice() * o.getQuantity();
+			if (o != null && !"Cancelled".equalsIgnoreCase(o.getStatus())) {
+				double price = o.getPrice() != null ? o.getPrice() : 0.0;
+				int qty = o.getQuantity() != null ? o.getQuantity() : 1;
+				double orderTotal = price * qty;
 				if (o.getDiscount() != null) {
 					orderTotal -= o.getDiscount();
 				}
