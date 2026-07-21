@@ -11,101 +11,110 @@
 
 	<!-- Page Header -->
 	<div class="text-center mb-5">
-		<h2 class="fw-bold">
-			<i class="fa-solid fa-percent text-danger"></i> Exclusive Offers &amp; Coupons
-		</h2>
-		<p class="text-muted">Use these coupon codes at checkout to save big on your orders!</p>
-		<hr class="w-50 mx-auto">
+		<span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold mb-2">
+			<i class="fa-solid fa-fire text-danger me-1"></i> HOT DEALS &amp; VOUCHERS
+		</span>
+		<h2 class="fw-bold fs-1">Exclusive Offers &amp; Coupons</h2>
+		<p class="text-muted">Use these active promo codes &amp; e-gift cards at checkout to get instant discounts!</p>
+		<hr class="w-25 mx-auto opacity-25">
 	</div>
 
-	<!-- No Offers Message -->
-	<div class="text-center py-5" th:if="${activeCoupons == null || activeCoupons.size() == 0}">
-		<i class="fa-solid fa-face-sad-tear fa-4x text-muted mb-3"></i>
-		<h5 class="text-muted">No active offers right now. Check back soon!</h5>
-	</div>
+	<!-- Active Coupons Section -->
+	<div class="mb-5">
+		<h4 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-tags text-danger me-2"></i> Active Discount Coupons</h4>
+		
+		<!-- No Coupons Message -->
+		<div class="text-center py-5 bg-light rounded-4 border" th:if="${activeCoupons == null || activeCoupons.size() == 0}">
+			<i class="fa-solid fa-face-sad-tear fa-3x text-muted mb-3"></i>
+			<h5 class="text-muted fw-bold">No active coupons available right now. Check back soon!</h5>
+		</div>
 
-	<!-- Coupons Grid -->
-	<div class="row g-4" th:if="${activeCoupons != null && activeCoupons.size() > 0}">
-		<div class="col-md-4" th:each="coupon : ${activeCoupons}">
-			<div class="card h-100 shadow-sm border-0 offer-card" style="border-radius:16px; overflow:hidden;">
+		<!-- Coupons Grid -->
+		<div class="row g-4" th:if="${activeCoupons != null && activeCoupons.size() > 0}">
+			<div class="col-md-4" th:each="coupon : ${activeCoupons}">
+				<div class="card h-100 shadow-sm border-0 offer-card" style="border-radius:16px; overflow:hidden;">
 
-				<!-- Top Ribbon -->
-				<div class="text-white text-center py-3 px-3"
-					style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">
-					<i class="fa-solid fa-tag fa-2x mb-2"></i>
-					<h3 class="fw-bold mb-0">[[${coupon.discountPercentage}]]% OFF</h3>
-					<small>on your entire order</small>
-				</div>
-
-				<!-- Card Body -->
-				<div class="card-body p-4 d-flex flex-column">
-					<!-- Coupon Code Box -->
-					<div class="text-center mb-3">
-						<p class="text-muted small mb-1 fw-semibold">COUPON CODE</p>
-						<div class="d-flex align-items-center justify-content-center gap-2">
-							<span class="px-4 py-2 fw-bold fs-5 text-primary rounded"
-								style="background:#e8f0fe; border: 2px dashed #4a90d9; letter-spacing:2px; cursor:pointer;"
-								th:id="${'code-' + couponStat.index}"
-								th:text="${coupon.code}">
-							</span>
-							<button class="btn btn-sm btn-outline-primary"
-									th:data-target="${'code-' + couponStat.index}"
-									onclick="copyCode(this.getAttribute('data-target'), this)"
-									title="Copy Code">
-								<i class="fa-solid fa-copy"></i>
-							</button>
-						</div>
+					<!-- Top Ribbon -->
+					<div class="text-white text-center py-3 px-3"
+						style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">
+						<i class="fa-solid fa-tag fa-2x mb-2"></i>
+						<h3 class="fw-bold mb-0">[[${coupon.discountPercentage}]]% OFF</h3>
+						<small class="opacity-90">on your order</small>
 					</div>
 
-					<!-- Details -->
-					<ul class="list-unstyled text-muted small flex-grow-1">
-						<li class="mb-1" th:if="${coupon.minOrderAmount != null && coupon.minOrderAmount > 0}">
-							<i class="fa-solid fa-circle-check text-success me-1"></i>
-							Minimum Order: <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
-							<strong th:text="${coupon.minOrderAmount}"></strong>
-						</li>
-						<li class="mb-1" th:unless="${coupon.minOrderAmount != null && coupon.minOrderAmount > 0}">
-							<i class="fa-solid fa-circle-check text-success me-1"></i>
-							No Minimum Order Required
-						</li>
-						<li class="mb-1" th:if="${coupon.expiryDate != null}">
-							<i class="fa-solid fa-calendar-xmark text-danger me-1"></i>
-							Valid till: <strong th:text="${#dates.format(coupon.expiryDate, 'dd MMM yyyy')}"></strong>
-						</li>
-						<li class="mb-1" th:if="${coupon.expiryDate == null}">
-							<i class="fa-solid fa-infinity text-info me-1"></i>
-							No Expiry — Use anytime!
-						</li>
-					</ul>
+					<!-- Card Body -->
+					<div class="card-body p-4 d-flex flex-column">
+						<!-- Coupon Code Box -->
+						<div class="text-center mb-3">
+							<p class="text-muted small mb-1 fw-semibold">COUPON CODE</p>
+							<div class="d-flex align-items-center justify-content-center gap-2">
+								<span class="px-3 py-2 fw-bold fs-5 text-primary rounded"
+									style="background:#e8f0fe; border: 2px dashed #4a90d9; letter-spacing:2px;"
+									th:id="${'code-' + couponStat.index}"
+									th:text="${coupon.code}">
+								</span>
+								<button class="btn btn-sm btn-outline-primary fw-bold"
+										th:data-target="${'code-' + couponStat.index}"
+										onclick="copyCode(this.getAttribute('data-target'), this)"
+										title="Copy Code">
+									<i class="fa-solid fa-copy"></i>
+								</button>
+							</div>
+						</div>
 
-					<!-- Use Now Button -->
-					<a href="/products" class="btn btn-danger mt-3 w-100 fw-semibold rounded-pill">
-						<i class="fa-solid fa-cart-shopping me-1"></i> Shop Now &amp; Use This Code
-					</a>
+						<!-- Details -->
+						<ul class="list-unstyled text-muted small flex-grow-1">
+							<li class="mb-2" th:if="${coupon.minOrderAmount != null && coupon.minOrderAmount > 0}">
+								<i class="fa-solid fa-circle-check text-success me-1"></i>
+								Minimum Order: <th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block>
+								<strong th:text="${coupon.minOrderAmount}"></strong>
+							</li>
+							<li class="mb-2" th:unless="${coupon.minOrderAmount != null && coupon.minOrderAmount > 0}">
+								<i class="fa-solid fa-circle-check text-success me-1"></i>
+								No Minimum Order Required
+							</li>
+							<li class="mb-2" th:if="${coupon.expiryDate != null}">
+								<i class="fa-solid fa-calendar-xmark text-danger me-1"></i>
+								Valid till: <strong th:text="${#dates.format(coupon.expiryDate, 'dd MMM yyyy')}"></strong>
+							</li>
+							<li class="mb-2" th:if="${coupon.expiryDate == null}">
+								<i class="fa-solid fa-infinity text-info me-1"></i>
+								No Expiry — Use anytime!
+							</li>
+						</ul>
+
+						<!-- Shop Now Button -->
+						<a href="/products" class="btn btn-danger mt-3 w-100 fw-bold rounded-pill shadow-sm">
+							<i class="fa-solid fa-cart-shopping me-1"></i> Shop Now &amp; Use Code
+						</a>
+					</div>
+
 				</div>
-
 			</div>
+		</div>
+	</div>
+
 	<!-- Active Gift Cards Section -->
-	<div class="mt-5 mb-4" th:if="${giftCards != null && giftCards.size() > 0}">
-		<h4 class="fw-bold mb-3"><i class="fa-solid fa-gift text-warning me-2"></i> Active Gift Cards Available</h4>
+	<div class="mb-5" th:if="${giftCards != null && giftCards.size() > 0}">
+		<h4 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-gift text-success me-2"></i> Active E-Gift Cards &amp; Vouchers</h4>
 		<div class="row g-4">
 			<div class="col-md-4" th:each="gc : ${giftCards}">
-				<div class="card h-100 shadow-sm border-0" style="border-radius:16px; background: linear-gradient(135deg, #11998e, #38ef7d); color: white;">
+				<div class="card h-100 shadow-sm border-0 offer-card" style="border-radius:16px; background: linear-gradient(135deg, #11998e, #38ef7d); color: white; overflow:hidden;">
 					<div class="card-body p-4 d-flex flex-column text-center">
-						<span class="badge bg-white text-success fw-bold mb-2 align-self-center"><i class="fa-solid fa-credit-card me-1"></i> E-GIFT CARD</span>
-						<h2 class="fw-extrabold mb-1">
+						<span class="badge bg-white text-success fw-bold mb-2 align-self-center px-3 py-2 rounded-pill"><i class="fa-solid fa-credit-card me-1"></i> E-GIFT CARD</span>
+						<h2 class="fw-extrabold mb-1 fs-1">
 							<th:block th:utext="${@commnServiceImpl.rupeeSign()}"></th:block> [[${#numbers.formatDecimal(gc.amount, 1, 0)}]]
 						</h2>
 						<p class="small opacity-90 mb-3">Flat Cash Discount Voucher</p>
-						<div class="bg-white text-dark rounded-3 p-2 mb-3 d-flex align-items-center justify-content-between">
+						<div class="bg-white text-dark rounded-3 p-2 mb-3 d-flex align-items-center justify-content-between shadow-sm">
 							<span class="fw-bold fs-5 text-success ms-2" th:id="${'gc-code-' + gcStat.index}" th:text="${gc.code}"></span>
-							<button class="btn btn-sm btn-success fw-bold px-3"
+							<button class="btn btn-sm btn-success fw-bold px-3 rounded-2"
 								th:data-target="${'gc-code-' + gcStat.index}"
 								onclick="copyCode(this.getAttribute('data-target'), this)">
 								<i class="fa-solid fa-copy"></i> Copy
 							</button>
 						</div>
-						<small class="opacity-75 mt-auto" th:if="${gc.expiryDate != null}">
+						<small class="opacity-85 mt-auto" th:if="${gc.expiryDate != null}">
 							<i class="fa-solid fa-clock me-1"></i> Valid till: [[${#dates.format(gc.expiryDate, 'dd MMM yyyy')}]]
 						</small>
 					</div>
@@ -114,16 +123,16 @@
 		</div>
 	</div>
 
-	<!-- Gift Cards & E-Vouchers Info Section -->
-	<div class="card shadow-sm border-0 rounded-4 mt-4 bg-primary p-4 text-white">
+	<!-- Gift Cards Info Section Banner -->
+	<div class="card shadow border-0 rounded-4 my-5 p-4 text-white" style="background: linear-gradient(135deg, #00b09b, #96c93d);">
 		<div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 			<div>
-				<span class="badge bg-warning text-dark fw-bold mb-2"><i class="fa-solid fa-gift me-1"></i> REDEEM GIFT CARD</span>
-				<h3 class="fw-extrabold mb-1">Redeem Gift Cards &amp; Loyalty Points</h3>
-				<p class="mb-0 opacity-90">Enter your Gift Card code during checkout or redeem on your profile for instant discount balance!</p>
+				<span class="badge bg-white text-dark fw-bold mb-2 px-3 py-2 rounded-pill"><i class="fa-solid fa-gift text-success me-1"></i> HOW TO REDEEM</span>
+				<h3 class="fw-extrabold mb-1">Have a SmartCart Gift Card Code?</h3>
+				<p class="mb-0 opacity-90">Enter your Gift Card code during order checkout or view your active rewards in your profile!</p>
 			</div>
 			<div>
-				<a href="/user/profile#loyalty-section" class="btn btn-warning text-dark fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">
+				<a href="/user/profile#loyalty-section" class="btn btn-light text-dark fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">
 					<i class="fa-solid fa-credit-card me-1"></i> My Rewards Profile
 				</a>
 				<a href="/products" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2">Shop Now</a>
@@ -135,10 +144,10 @@
 
 <!-- Copy Animation Toast -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
-	<div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive">
+	<div id="copyToast" class="toast align-items-center text-white bg-success border-0 shadow" role="alert" aria-live="assertive">
 		<div class="d-flex">
-			<div class="toast-body">
-				<i class="fa-solid fa-circle-check me-1"></i> Coupon code copied!
+			<div class="toast-body fw-bold">
+				<i class="fa-solid fa-circle-check me-2"></i> Code copied to clipboard!
 			</div>
 			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
 		</div>
@@ -159,15 +168,12 @@
 function copyCode(elemId, btn) {
 	const text = document.getElementById(elemId).innerText;
 	navigator.clipboard.writeText(text).then(() => {
-		btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-		btn.classList.remove('btn-outline-primary');
-		btn.classList.add('btn-success');
+		const originalHTML = btn.innerHTML;
+		btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Copied';
 		const toast = new bootstrap.Toast(document.getElementById('copyToast'));
 		toast.show();
 		setTimeout(() => {
-			btn.innerHTML = '<i class="fa-solid fa-copy"></i>';
-			btn.classList.remove('btn-success');
-			btn.classList.add('btn-outline-primary');
+			btn.innerHTML = originalHTML;
 		}, 2000);
 	});
 }
