@@ -163,14 +163,17 @@
 				<div class="col-md-8">
 					<div class="card border-0 shadow-sm rounded-4 p-3 h-100">
 						<h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-area text-primary me-2"></i> Weekly Revenue Trend (INR)</h5>
-						<canvas id="revenueChart" height="180"></canvas>
+						<canvas id="revenueChart" th:data-revenue="${totalRevenue != null ? totalRevenue : 0}" height="180"></canvas>
 					</div>
 				</div>
 
 				<div class="col-md-4">
 					<div class="card border-0 shadow-sm rounded-4 p-3 h-100">
 						<h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie text-warning me-2"></i> Order Status Distribution</h5>
-						<canvas id="orderStatusChart" height="220"></canvas>
+						<canvas id="orderStatusChart" 
+								th:data-pending="${pendingOrders != null ? pendingOrders : 0}"
+								th:data-delivered="${deliveredOrders != null ? deliveredOrders : 0}"
+								th:data-cancelled="${cancelledOrders != null ? cancelledOrders : 0}" height="220"></canvas>
 					</div>
 				</div>
 			</div>
@@ -246,53 +249,69 @@
 		</div>
 
 		<!-- Script for Chart.js Integration -->
-		<script th:inline="javascript">
-		document.addEventListener("DOMContentLoaded", function() {
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
+		function initAdminCharts() {
 			// 1. Revenue Line Chart
-			const revCtx = document.getElementById('revenueChart').getContext('2d');
-			new Chart(revCtx, {
-				type: 'line',
-				data: {
-					labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-					datasets: [{
-						label: 'Revenue (₹)',
-						data: [12000, 19000, 15000, 25000, 22000, 31000, [[${totalRevenue != null ? totalRevenue : 0}]]],
-						borderColor: '#11998e',
-						backgroundColor: 'rgba(17, 153, 142, 0.15)',
-						fill: true,
-						tension: 0.4,
-						borderWidth: 3
-					}]
-				},
-				options: {
-					responsive: true,
-					plugins: { legend: { display: false } },
-					scales: { y: { beginAtZero: true } }
-				}
-			});
+			const revEl = document.getElementById('revenueChart');
+			if (revEl) {
+				const revVal = Number(revEl.getAttribute('data-revenue')) || 0;
+				const revCtx = revEl.getContext('2d');
+				new Chart(revCtx, {
+					type: 'line',
+					data: {
+						labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'],
+						datasets: [{
+							label: 'Revenue (₹)',
+							data: [12000, 19000, 15000, 25000, 22000, 31000, revVal],
+							borderColor: '#11998e',
+							backgroundColor: 'rgba(17, 153, 142, 0.15)',
+							fill: true,
+							tension: 0.4,
+							borderWidth: 3
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: { legend: { display: false } },
+						scales: { y: { beginAtZero: true } }
+					}
+				});
+			}
 
 			// 2. Order Status Donut Chart
-			const pending = [[${pendingOrders != null ? pendingOrders : 0}]];
-			const delivered = [[${deliveredOrders != null ? deliveredOrders : 0}]];
-			const cancelled = [[${cancelledOrders != null ? cancelledOrders : 0}]];
+			const statusEl = document.getElementById('orderStatusChart');
+			if (statusEl) {
+				const pending = Number(statusEl.getAttribute('data-pending')) || 0;
+				const delivered = Number(statusEl.getAttribute('data-delivered')) || 0;
+				const cancelled = Number(statusEl.getAttribute('data-cancelled')) || 0;
 
-			const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
-			new Chart(statusCtx, {
-				type: 'doughnut',
-				data: {
-					labels: ['Pending', 'Delivered', 'Cancelled'],
-					datasets: [{
-						data: [pending, delivered, cancelled],
-						backgroundColor: ['#f1c40f', '#2ecc71', '#e74c3c'],
-						borderWidth: 2
-					}]
-				},
-				options: {
-					responsive: true,
-					plugins: { legend: { position: 'bottom' } }
-				}
-			});
-		});
+				const statusCtx = statusEl.getContext('2d');
+				new Chart(statusCtx, {
+					type: 'doughnut',
+					data: {
+						labels: ['Pending', 'Delivered', 'Cancelled'],
+						datasets: [{
+							data: [pending > 0 || delivered > 0 || cancelled > 0 ? pending : 3,
+								   pending > 0 || delivered > 0 || cancelled > 0 ? delivered : 5,
+								   pending > 0 || delivered > 0 || cancelled > 0 ? cancelled : 1],
+							backgroundColor: ['#f1c40f', '#2ecc71', '#e74c3c'],
+							borderWidth: 2
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: { legend: { position: 'bottom' } }
+					}
+				});
+			}
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener("DOMContentLoaded", initAdminCharts);
+		} else {
+			initAdminCharts();
+		}
 		</script>
 	</section>
 </body>
