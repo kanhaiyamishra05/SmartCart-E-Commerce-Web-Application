@@ -77,9 +77,14 @@
 															[[${p.price}]]</span> <span class="fs-6 text-success">[[${p.discount}]]%
 															off </span>
 													</p>
-													<a th:href="@{'/product/'+${p.id}}"
-														class="btn btn-primary col-md-6 offset-md-3">View
-														Details</a>
+													<div class="d-flex gap-2 justify-content-center mt-2">
+														<a th:href="@{'/product/'+${p.id}}" class="btn btn-sm btn-primary fw-bold px-3">View Details</a>
+														<button type="button" class="btn btn-sm btn-outline-dark fw-bold px-2"
+																th:data-id="${p.id}" th:data-title="${p.title}" th:data-image="${p.image}" th:data-price="${p.price}" th:data-discprice="${p.discountPrice}" th:data-discount="${p.discount}" th:data-cat="${p.category}"
+																onclick="toggleCompareProduct(Number(this.getAttribute('data-id')), this.getAttribute('data-title'), this.getAttribute('data-image'), this.getAttribute('data-price'), this.getAttribute('data-discprice'), this.getAttribute('data-discount'), this.getAttribute('data-cat'))">
+															<i class="fa-solid fa-code-compare text-success"></i> Compare
+														</button>
+													</div>
 												</div>
 											</div>
 										</div>

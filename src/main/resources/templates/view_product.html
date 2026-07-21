@@ -102,7 +102,11 @@
 									<a th:href="@{'/user/addCart?pid='+${product.id}+'&uid='+${user.id}}" class="btn btn-danger btn-lg fw-bold"><i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart</a>
 									<a th:href="@{'/user/buy-now?pid=' + ${product.id}}" class="btn btn-warning text-dark btn-lg fw-bold"><i class="fa-solid fa-bolt me-1"></i> 1-Click Buy Now</a>
 									<a th:href="@{'/user/add-wishlist?pid='+${product.id}}" class="btn btn-outline-secondary"><i class="fa-regular fa-heart me-1"></i> Add To Wishlist</a>
-								</th:block>
+								<button type="button" class="btn btn-outline-dark fw-bold mt-2"
+										th:data-id="${product.id}" th:data-title="${product.title}" th:data-image="${product.image}" th:data-price="${product.price}" th:data-discprice="${product.discountPrice}" th:data-discount="${product.discount}" th:data-cat="${product.category}"
+										onclick="toggleCompareProduct(Number(this.getAttribute('data-id')), this.getAttribute('data-title'), this.getAttribute('data-image'), this.getAttribute('data-price'), this.getAttribute('data-discprice'), this.getAttribute('data-discount'), this.getAttribute('data-cat'))">
+									<i class="fa-solid fa-code-compare text-success me-1"></i> Add to Compare
+								</button>
 							</div>
 						</th:block>
 

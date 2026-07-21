@@ -180,9 +180,20 @@
 							</a>
 							<!-- Return Submitted Indicator or Return Button -->
 							<th:block th:if="${returnRequestByOrderId.containsKey(o.id)}">
-								<button class="btn btn-sm btn-outline-secondary mb-1" disabled>
-									<i class="fa-solid fa-rotate-left me-1"></i> Return Active
-								</button>
+								<th:block th:with="retReq=${returnRequestByOrderId.get(o.id)}">
+									<button th:if="${retReq.status == 'PENDING'}" class="btn btn-sm btn-outline-warning mb-1" disabled>
+										<i class="fa-solid fa-clock me-1"></i> Return Pending
+									</button>
+									<button th:if="${retReq.status == 'APPROVED'}" class="btn btn-sm btn-outline-info mb-1" disabled>
+										<i class="fa-solid fa-truck-ramp-box me-1"></i> Return Approved
+									</button>
+									<span th:if="${retReq.status == 'REFUNDED'}" class="badge bg-success mb-1 p-2">
+										<i class="fa-solid fa-hand-holding-dollar me-1"></i> Returned &amp; Refunded
+									</span>
+									<span th:if="${retReq.status == 'REJECTED'}" class="badge bg-danger mb-1 p-2">
+										<i class="fa-solid fa-xmark me-1"></i> Return Rejected
+									</span>
+								</th:block>
 							</th:block>
 							<!-- Return Request (only for Delivered and not yet returned) -->
 							<th:block th:if="${o.status == 'Delivered' && !returnRequestByOrderId.containsKey(o.id)}">
