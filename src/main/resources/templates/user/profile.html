@@ -22,6 +22,36 @@
 						<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
 					</th:block>
 					<hr>
+
+					<!-- SmartCart Loyalty & Referral Rewards Section -->
+					<div class="card shadow-sm border-0 rounded-4 mb-4 bg-primary text-white p-4" id="loyalty-section">
+						<div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+							<div>
+								<span class="badge bg-warning text-dark fw-bold mb-2"><i class="fa-solid fa-gift me-1"></i> MY REWARDS &amp; REFERRAL</span>
+								<h3 class="fw-extrabold mb-1">
+									<i class="fa-solid fa-coins me-2 text-warning"></i> [[${user.loyaltyPoints != null ? user.loyaltyPoints : 50}]] Loyalty Points
+								</h3>
+								<p class="mb-0 opacity-90 small">Use your points for instant discounts during checkout (1 Point = ₹1 Discount)!</p>
+							</div>
+							<div class="bg-white bg-opacity-10 p-3 rounded-3 border border-white border-opacity-25 text-center" style="min-width: 220px;">
+								<small class="d-block text-white opacity-75 mb-1">Your Referral Code</small>
+								<div class="input-group input-group-sm">
+									<input type="text" id="refCode" class="form-control form-control-sm text-center fw-bold text-dark bg-white" th:value="${user.referralCode != null ? user.referralCode : 'SMART' + user.id}" readonly>
+									<button class="btn btn-warning btn-sm fw-bold" onclick="copyRefCode()"><i class="fa-solid fa-copy"></i> Copy</button>
+								</div>
+								<small class="d-block text-white opacity-75 mt-1" style="font-size: 0.72rem;">Share with friends to earn 50 Pts on signup!</small>
+							</div>
+						</div>
+					</div>
+
+					<script>
+					function copyRefCode() {
+						const code = document.getElementById('refCode');
+						code.select();
+						document.execCommand('copy');
+						alert('Referral Code copied: ' + code.value);
+					}
+					</script>
 					<div class="text-center">
 						<img alt="" th:src="@{'../img/profile_img/'+${user.profileImage}}"
 							class="border p-2"

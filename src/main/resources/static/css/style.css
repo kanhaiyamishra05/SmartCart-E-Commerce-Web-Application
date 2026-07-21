@@ -376,24 +376,44 @@
 
 /* ===== HOMEPAGE STYLES ===== */
 .hero-slider-img {
-	height: 420px;
+	height: 440px;
 	object-fit: cover;
 	filter: none !important;
+}
+
+.carousel-item-gradient {
+	position: relative;
+}
+
+.carousel-item-gradient::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0) 100%);
+	pointer-events: none;
 }
 
 .hero-overlay-content {
 	position: absolute;
 	top: 50%;
-	left: 8%;
+	left: 6%;
 	transform: translateY(-50%);
 	color: #ffffff;
 	z-index: 5;
-	max-width: 550px;
-	background: rgba(0, 0, 0, 0.45);
-	backdrop-filter: blur(8px);
-	padding: 30px;
-	border-radius: 16px;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	max-width: 580px;
+	background: none !important;
+	backdrop-filter: none !important;
+	padding: 0 !important;
+	border: none !important;
+}
+
+.hero-overlay-content h2 {
+	font-weight: 800;
+	text-shadow: 0 3px 12px rgba(0,0,0,0.8);
+}
+
+.hero-overlay-content p {
+	text-shadow: 0 2px 8px rgba(0,0,0,0.8);
 }
 
 .trust-feature-card {

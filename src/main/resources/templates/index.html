@@ -16,7 +16,7 @@
 				<button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
 			</div>
 			<div class="carousel-inner">
-				<div class="carousel-item active position-relative">
+				<div class="carousel-item active position-relative carousel-item-gradient">
 					<img src="/img/ecom1.png" class="d-block w-100 hero-slider-img" alt="Big Shopping Deals">
 					<div class="hero-overlay-content d-none d-md-block">
 						<span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-2 rounded-pill"><i class="fa-solid fa-fire me-1"></i> Mega Shopping Festival</span>
@@ -28,7 +28,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="carousel-item position-relative">
+				<div class="carousel-item position-relative carousel-item-gradient">
 					<img src="/img/ecom3.jpg" class="d-block w-100 hero-slider-img" alt="Electronics Sale">
 					<div class="hero-overlay-content d-none d-md-block">
 						<span class="badge bg-danger fw-bold mb-2 px-3 py-2 rounded-pill"><i class="fa-solid fa-bolt me-1"></i> Tech &amp; Gadgets Sale</span>
@@ -39,7 +39,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="carousel-item position-relative">
+				<div class="carousel-item position-relative carousel-item-gradient">
 					<img src="/img/ecom2.jpg" class="d-block w-100 hero-slider-img" alt="Fashion Trends">
 					<div class="hero-overlay-content d-none d-md-block">
 						<span class="badge bg-success fw-bold mb-2 px-3 py-2 rounded-pill"><i class="fa-solid fa-shirt me-1"></i> New Season Arrivals</span>
@@ -191,9 +191,14 @@
 					<h3 class="fw-extrabold mb-1">Earn Loyalty Points &amp; Free Rewards!</h3>
 					<p class="mb-0 opacity-90">Get <strong>50 Loyalty Points</strong> instantly on signup + <strong>50 Points</strong> for every friend you refer!</p>
 				</div>
-				<div>
-					<a href="/register" class="btn btn-light text-primary fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">Register Now</a>
-					<a href="/user/profile" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2">My Rewards</a>
+				<div th:if="${user == null}">
+					<a href="/register" class="btn btn-light text-primary fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">Register &amp; Get 50 Pts</a>
+					<a href="/signin" class="btn btn-outline-light fw-bold rounded-pill px-4 py-2">Sign In</a>
+				</div>
+				<div th:if="${user != null}">
+					<a href="/user/profile#loyalty-section" class="btn btn-light text-primary fw-bold rounded-pill px-4 py-2 me-2 shadow-sm">
+						<i class="fa-solid fa-coins me-1 text-warning"></i> My Rewards &amp; Referral Code
+					</a>
 				</div>
 			</div>
 		</div>
