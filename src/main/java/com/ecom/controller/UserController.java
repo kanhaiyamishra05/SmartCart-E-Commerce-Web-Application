@@ -52,6 +52,9 @@ public class UserController {
 	private OrderService orderService;
 
 	@Autowired
+	private com.ecom.service.InvoiceService invoiceService;
+
+	@Autowired
 	private ProductOrderRepository productOrderRepository;
 
 	@Autowired
@@ -551,6 +554,29 @@ public class UserController {
 	public String removeLoyalty(HttpSession session) {
 		session.removeAttribute("loyaltyPointsToRedeem");
 		session.removeAttribute("loyaltyDiscount");
+		return "redirect:/user/orders";
+	}
+
+	// ============ INVOICE PDF DOWNLOAD ============
+	@GetMapping("/download-invoice/{orderId}")
+	public org.springframework.http.ResponseEntity<byte[]> downloadInvoice(@PathVariable Integer orderId, Principal p) {
+		UserDtls user = getLoggedInUserDetails(p);
+		com.ecom.model.ProductOrder order = productOrderRepository.findById(orderId).orElse(null);
+		if (order == null || !order.getUser().getId().equals(user.getId())) {
+			return org.springframework.http.ResponseEntity.notFound().build();
+		}
+		byte[] pdfBytes = invoiceService.generateInvoicePdf(order);
+		org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+		headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+		headers.setContentDisposition(org.springframework.http.ContentDisposition.attachment().filename("Invoice-" + order.getOrderId() + ".pdf").build());
+		return new org.springframework.http.ResponseEntity<>(pdfBytes, headers, org.springframework.http.HttpStatus.OK);
+	}
+
+	// ============ 1-CLICK BUY NOW ============
+	@GetMapping("/buy-now")
+	public String buyNow(@RequestParam Integer pid, Principal p) {
+		UserDtls user = getLoggedInUserDetails(p);
+		cartService.saveCart(pid, user.getId());
 		return "redirect:/user/orders";
 	}
 

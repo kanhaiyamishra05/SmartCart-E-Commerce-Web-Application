@@ -78,6 +78,9 @@ public class AdminController {
 	private com.ecom.repository.GiftCardRepository giftCardRepository;
 
 	@Autowired
+	private com.ecom.repository.StockNotificationRepository stockNotificationRepository;
+
+	@Autowired
 	private com.ecom.repository.SubscriberRepository subscriberRepository;
 
 	@Autowired
@@ -104,7 +107,26 @@ public class AdminController {
 	}
 
 	@GetMapping("/")
-	public String index() {
+	public String index(Model m) {
+		List<ProductOrder> allOrders = productOrderRepository.findAll();
+		double totalRevenue = allOrders.stream()
+				.filter(o -> !"Cancelled".equalsIgnoreCase(o.getStatus()))
+				.mapToDouble(o -> o.getPrice() * o.getQuantity())
+				.sum();
+		long totalProducts = productService.getAllProducts().size();
+		long totalUsers = userService.getUsers("ROLE_USER").size();
+		long pendingOrders = allOrders.stream().filter(o -> "In Progress".equalsIgnoreCase(o.getStatus())).count();
+		long deliveredOrders = allOrders.stream().filter(o -> "Delivered".equalsIgnoreCase(o.getStatus())).count();
+		long cancelledOrders = allOrders.stream().filter(o -> "Cancelled".equalsIgnoreCase(o.getStatus())).count();
+
+		m.addAttribute("totalRevenue", totalRevenue);
+		m.addAttribute("totalOrders", allOrders.size());
+		m.addAttribute("totalProducts", totalProducts);
+		m.addAttribute("totalUsers", totalUsers);
+		m.addAttribute("pendingOrders", pendingOrders);
+		m.addAttribute("deliveredOrders", deliveredOrders);
+		m.addAttribute("cancelledOrders", cancelledOrders);
+
 		return "admin/index";
 	}
 
@@ -307,9 +329,23 @@ public class AdminController {
 		if (product.getDiscount() < 0 || product.getDiscount() > 100) {
 			session.setAttribute("errorMsg", "invalid Discount");
 		} else {
+			Product oldProduct = productService.getProductById(product.getId());
+			int oldStock = oldProduct != null ? oldProduct.getStock() : 0;
 			Product updateProduct = productService.updateProduct(product, image);
 			if (!ObjectUtils.isEmpty(updateProduct)) {
 				session.setAttribute("succMsg", "Product update success");
+				if (oldStock == 0 && updateProduct.getStock() > 0) {
+					List<com.ecom.model.StockNotification> list = stockNotificationRepository.findByProductIdAndIsNotifiedFalse(updateProduct.getId());
+					for (com.ecom.model.StockNotification sn : list) {
+						sn.setIsNotified(true);
+						stockNotificationRepository.save(sn);
+						try {
+							commonUtil.sendNewsletterMail(sn.getUserEmail(), "Back in Stock: " + updateProduct.getTitle(), "Great news! " + updateProduct.getTitle() + " is now back in stock on SmartCart. Order now before it runs out!");
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
 			} else {
 				session.setAttribute("errorMsg", "Something wrong on server");
 			}

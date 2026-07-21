@@ -73,6 +73,12 @@ public class HomeController {
 	@Autowired
 	private com.ecom.repository.ProductReviewRepository productReviewRepository;
 
+	@Autowired
+	private com.ecom.repository.StockNotificationRepository stockNotificationRepository;
+
+	@Autowired
+	private com.ecom.repository.ProductQuestionRepository productQuestionRepository;
+
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
 		if (p != null) {
@@ -161,11 +167,56 @@ public class HomeController {
 		Product productById = productService.getProductById(id);
 		List<ProductReview> reviews = reviewService.getReviewsByProduct(id);
 		Double avgRating = reviewService.getAverageRating(id);
+		List<com.ecom.model.ProductQuestion> questions = productQuestionRepository.findByProductIdOrderByAskedAtDesc(id);
 
 		m.addAttribute("product", productById);
 		m.addAttribute("reviews", reviews);
 		m.addAttribute("avgRating", avgRating);
+		m.addAttribute("questions", questions);
 		return "view_product";
+	}
+
+	@GetMapping("/api/check-pincode")
+	@org.springframework.web.bind.annotation.ResponseBody
+	public java.util.Map<String, Object> checkPincode(@RequestParam String pincode) {
+		java.util.Map<String, Object> res = new java.util.HashMap<>();
+		String cleanPin = pincode == null ? "" : pincode.trim();
+		if (cleanPin.matches("^[1-9][0-9]{5}$")) {
+			java.util.Calendar cal = java.util.Calendar.getInstance();
+			cal.add(java.util.Calendar.DAY_OF_MONTH, 3);
+			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("EEEE, dd MMMM yyyy");
+			res.put("available", true);
+			res.put("message", "Standard Delivery Available for " + cleanPin + "!");
+			res.put("estimatedDate", sdf.format(cal.getTime()));
+		} else {
+			res.put("available", false);
+			res.put("message", "Invalid 6-digit Indian Pincode. Please enter a valid 6-digit pincode.");
+		}
+		return res;
+	}
+
+	@PostMapping("/user/notify-stock")
+	public String notifyStock(@RequestParam Integer pid, @RequestParam String email, HttpSession session) {
+		if (!stockNotificationRepository.existsByProductIdAndUserEmailAndIsNotifiedFalse(pid, email.trim())) {
+			stockNotificationRepository.save(new com.ecom.model.StockNotification(null, pid, email.trim(), false, new java.util.Date()));
+			session.setAttribute("succMsg", "Notification set! We will email you as soon as this item is back in stock.");
+		} else {
+			session.setAttribute("succMsg", "You are already registered for back-in-stock alert on this item!");
+		}
+		return "redirect:/product/" + pid;
+	}
+
+	@PostMapping("/user/add-question")
+	public String addQuestion(@RequestParam Integer pid, @RequestParam String question, Principal p, HttpSession session) {
+		UserDtls user = p != null ? userService.getUserByEmail(p.getName()) : null;
+		Product product = productService.getProductById(pid);
+		if (product != null && user != null) {
+			productQuestionRepository.save(new com.ecom.model.ProductQuestion(null, product, user, question.trim(), null, new java.util.Date()));
+			session.setAttribute("succMsg", "Question posted successfully!");
+		} else {
+			session.setAttribute("errorMsg", "Please login to ask a question.");
+		}
+		return "redirect:/product/" + pid;
 	}
 
 	@PostMapping("/saveUser")
